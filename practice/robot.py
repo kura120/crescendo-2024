@@ -12,7 +12,9 @@ class MyRobot(wpilib.TimedRobot):
     def robotInit(self):
         motor = rev.CANSparkMax(self.motorID, self.motorType) 
 
-    
+    def disabledInit(self):
+        return super().disabledInit()
+
     def testPeriodic(self):
         pass
 
