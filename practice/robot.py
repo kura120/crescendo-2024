@@ -10,13 +10,17 @@ class MyRobot(wpilib.TimedRobot):
 
     
     def robotInit(self):
+
         self.motor = rev.CANSparkMax(self.motorID, self.brushless) 
+        self.motor.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
+
 
     def disabledInit(self):
+
         self.motor.set(0)
 
     def testPeriodic(self):
-        self.motor.set(1)
+        self.motor.set(0.1)
         
 
 
