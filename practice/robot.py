@@ -1,7 +1,7 @@
 # THIS IS OUR PRACTICE PROJECT TO SPIN A MOTOR!!!!!!!!
 
 import robotpy, wpilib, wpilib.drive, rev
-import math
+import math, time
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -12,8 +12,8 @@ class MyRobot(wpilib.TimedRobot):
     def robotInit(self):
         motor = rev.CANSparkMax(self.motorID, self.motorType) 
 
-
-        return super().robotInit()
-
+    
+    def testPeriodic(self):
+        pass
 
 
