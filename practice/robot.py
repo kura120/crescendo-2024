@@ -6,17 +6,17 @@ import math, time
 
 class MyRobot(wpilib.TimedRobot):
     motorID = 1
-    motorType = rev.kBrushless
+    brushless = rev.CANSparkMaxLowLevel.MotorType.kBrushless
 
     
     def robotInit(self):
-        motor = rev.CANSparkMax(self.motorID, self.motorType) 
+        self.motor = rev.CANSparkMax(self.motorID, self.brushless) 
 
     def disabledInit(self):
-        return super().disabledInit()
+        self.motor.set(0)
 
     def testPeriodic(self):
-
-        pass
+        self.motor.set(1)
+        
 
 
