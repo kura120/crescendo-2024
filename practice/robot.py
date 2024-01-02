@@ -5,9 +5,12 @@ import math
 
 
 class MyRobot(wpilib.TimedRobot):
+    motorID = 0
+    motorType = rev.kBrushless
 
+    
     def robotInit(self):
-        motor = rev.CANSparkMax(0)
+        motor = rev.CANSparkMax(self.motorID, self.motorType) 
 
 
         return super().robotInit()
