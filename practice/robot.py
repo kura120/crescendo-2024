@@ -7,7 +7,7 @@ import math
 class MyRobot(wpilib.TimedRobot):
 
     def robotInit(self):
-        
+        motor = rev.CANSparkMax(0)
 
 
         return super().robotInit()
