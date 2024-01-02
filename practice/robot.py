@@ -5,7 +5,7 @@ import math, time
 
 
 class MyRobot(wpilib.TimedRobot):
-    motorID = 0
+    motorID = 1
     motorType = rev.kBrushless
 
     
@@ -16,6 +16,7 @@ class MyRobot(wpilib.TimedRobot):
         return super().disabledInit()
 
     def testPeriodic(self):
+
         pass
 
 
