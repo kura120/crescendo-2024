@@ -1,3 +1,8 @@
+<h1> Installing RobotPy Library </h1>
+1. Make sure python 3.11 is installed
+
+2. [RobotPy set up]([url](https://robotpy.readthedocs.io/en/stable/install/computer.html))
+
 <h1> Deploying Code </h1>
 1. Connect to 3340_Test3340 network  
 
