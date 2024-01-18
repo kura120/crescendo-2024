@@ -34,7 +34,6 @@ class MyRobot(wpilib.TimedRobot):
 
         self.motor.set(0)
 
-
     def testPeriodic(self):
         if abs(self.joystick.getY()) > 0.1: #Analog input with floats
 
