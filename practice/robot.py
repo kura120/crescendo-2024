@@ -12,10 +12,7 @@ class MyRobot(wpilib.TimedRobot):
         self.motorEncoder = self.motor.getEncoder()
         self.motor.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
         self.motorEncoder.setPosition(0)
-        self.joystick = wpilib.Joystick(0)  
-
-
-        self.joystick = wpilib.Joystick(0)        
+        self.joystick = wpilib.Joystick(0)      
 
 
     def robotPeriodic(self):
