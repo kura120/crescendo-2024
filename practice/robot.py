@@ -15,24 +15,16 @@ class MyRobot(wpilib.TimedRobot):
         self.joystick = wpilib.Joystick(0)  
 
 
-        self.joystick = wpilib.Joystick(0)
-
-
-
-
-
-
-
-
-        
+        self.joystick = wpilib.Joystick(0)        
 
 
     def robotPeriodic(self):
         wpilib.SmartDashboard.putNumber("Encoder", self.motorEncoder.getPosition())
 
-    def disabledInit(self):
 
+    def disabledInit(self):
         self.motor.set(0)
+        
 
     def testPeriodic(self):
         if abs(self.joystick.getY()) > 0.1: #Analog input with floats
@@ -44,6 +36,7 @@ class MyRobot(wpilib.TimedRobot):
             self.motor.set(0.1)
         else:
             self.motor.set(0)
+
 
 if __name__ == "__main__":
     wpilib.run(MyRobot)
