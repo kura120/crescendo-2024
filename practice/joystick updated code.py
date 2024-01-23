@@ -34,7 +34,7 @@ class MyRobot(wpilib.TimedRobot):
 
         else:
            self.motor1.set(0)
-             self.motor2.set(0)
+           self.motor2.set(0)
 
     #Button 1 -- forward
         if self.joystick.getRawButton(1):
@@ -65,28 +65,28 @@ class MyRobot(wpilib.TimedRobot):
       #assign the number for each specific button on the controller ABOVE ^
 
 
-    kMotorPort = 0
-    kJoystickPort = 0
-    kEncoderPortA = 0
-    kEncoderPortB = 1
+    # kMotorPort = 0
+    # kJoystickPort = 0
+    # kEncoderPortA = 0
+    # kEncoderPortB = 1
 
-    def robotInit(self):
-        """Robot initialization function"""
+    # def robotInit(self):
+    #     """Robot initialization function"""
 
-        self.motor = wpilib.PWMSparkMax(self.kMotorPort)
-        self.joystick = wpilib.Joystick(self.kJoystickPort)
-        self.encoder = wpilib.Encoder(self.kEncoderPortA, self.kEncoderPortB)
-        # Use SetDistancePerPulse to set the multiplier for GetDistance
-        #LM: Following measurements will vary:
-        # This is set up assuming a 6 inch wheel with a 360 CPR encoder.
-        self.encoder.setDistancePerPulse((math.pi * 6) / 360.0)
+    #     self.motor = wpilib.PWMSparkMax(self.kMotorPort)
+    #     self.joystick = wpilib.Joystick(self.kJoystickPort)
+    #     self.encoder = wpilib.Encoder(self.kEncoderPortA, self.kEncoderPortB)
+    #     # Use SetDistancePerPulse to set the multiplier for GetDistance
+    #     #LM: Following measurements will vary:
+    #     # This is set up assuming a 6 inch wheel with a 360 CPR encoder.
+    #     self.encoder.setDistancePerPulse((math.pi * 6) / 360.0)
 
-    def robotPeriodic(self):
-        """The RobotPeriodic function is called every control packet no matter the robot mode."""
-        wpilib.SmartDashboard.putNumber("Encoder", self.encoder.getDistance())
+    # def robotPeriodic(self):
+    #     """The RobotPeriodic function is called every control packet no matter the robot mode."""
+    #     wpilib.SmartDashboard.putNumber("Encoder", self.encoder.getDistance())
 
-    def teleopPeriodic(self):
-        self.motor.set(self.joystick.getY())
+    # def teleopPeriodic(self):
+    #     self.motor.set(self.joystick.getY())
 
 
 if __name__ == "__main__":
