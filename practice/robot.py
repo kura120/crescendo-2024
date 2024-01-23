@@ -8,7 +8,14 @@ class MyRobot(wpilib.TimedRobot):
     brushless = rev.CANSparkMaxLowLevel.MotorType.kBrushless
     
     def robotInit(self):
-        self.motor = rev.CANSparkMax(1, self.brushless) 
+        self.motor_L1 = rev.CANSparkMax(1, self.brushless) 
+        self.motor_L2 = rev.CANSparkMax(1, self.brushless)
+
+        
+        self.motors_L = wpilib.MotorControllerGroup(self.motor_L1, self.motor_L2)
+
+
+
         self.motorEncoder = self.motor.getEncoder()
         self.motor.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
         self.motorEncoder.setPosition(0)
@@ -25,7 +32,6 @@ class MyRobot(wpilib.TimedRobot):
 
     def testPeriodic(self):
         if abs(self.joystick.getY()) > 0.1: #Analog input with floats
-
             self.motor.set(self.joystick.getY())
         else:
              self.motor.set(0)
