@@ -7,30 +7,30 @@ import math, time
 class MyRobot(wpilib.TimedRobot):
     brushless = rev.CANSparkMaxLowLevel.MotorType.kBrushless
     
-  #  def robotInit(self):
+    def robotInit(self):
         #MOTOR CONTROLS _ LEFT
-    self.motor_L1 = rev.CANSparkMax(1, self.brushless) 
-       # self.motor_L2 = rev.CANSparkMax(1, self.brushless)
+        self.motor_L1 = rev.CANSparkMax(1, self.brushless) 
+        # self.motor_L2 = rev.CANSparkMax(1, self.brushless)
 
-        
-       # self.motors_L = wpilib.MotorControllerGroup(self.motor_L1, self.motor_L2)
+            
+        # self.motors_L = wpilib.MotorControllerGroup(self.motor_L1, self.motor_L2)
 
-        #MOTOR CONTROL _ RIGHT
+            #MOTOR CONTROL _ RIGHT
 
-        #self.motor_R1 = rev.CANSparkMax(3, self.brushless) 
-        #self.motor_R2 = rev.CANSparkMax(4, self.brushless)
+            #self.motor_R1 = rev.CANSparkMax(3, self.brushless) 
+            #self.motor_R2 = rev.CANSparkMax(4, self.brushless)
 
-        
-       # self.motors_R = wpilib.MotorControllerGroup(self.motor_R1, self.motor_R2)
-
-
+            
+        # self.motors_R = wpilib.MotorControllerGroup(self.motor_R1, self.motor_R2)
 
 
 
-    self.motorEncoder = self.motor.getEncoder()
-    self.motor.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
-    self.motorEncoder.setPosition(0)
-    self.joystick = wpilib.Joystick(0)      
+
+
+        self.motorEncoder = self.motor.getEncoder()
+        self.motor.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
+        self.motorEncoder.setPosition(0)
+        self.joystick = wpilib.Joystick(0)      
 
 
     def robotPeriodic(self):
