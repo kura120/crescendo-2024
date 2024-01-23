@@ -1,0 +1,10 @@
+ def testPeriodic(self):
+        if abs(self.joystick.getY()) > 0.1: #Analog input with floats
+
+            self.motor.set(self.joystick.getY())
+        else:
+             self.motor.set(0)
+        if self.joystick.getRawButton(1):
+            self.motor.set(0.1)
+        else:
+            self.motor.set(0)
