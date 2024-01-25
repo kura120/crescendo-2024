@@ -27,8 +27,8 @@ class MyRobot(wpilib.TimedRobot):
 
 
 
-        self.motorEncoder = self.motor.getEncoder()
-        self.motor.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
+        self.motorEncoder = self.motor_L1.getEncoder()
+        self.motor_L1.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
         self.motorEncoder.setPosition(0)
         self.joystick = wpilib.Joystick(0)      
 
@@ -38,18 +38,18 @@ class MyRobot(wpilib.TimedRobot):
 
 
     def disabledInit(self):
-        self.motor.set(0)
+        self.motor_L1.set(0)
         
 
     def testPeriodic(self):
         if abs(self.joystick.getY()) > 0.1: #Analog input with floats
-            self.motor.set(self.joystick.getY())
+            self.motor_L1.set(self.joystick.getY())
         else:
-             self.motor.set(0)
+             self.motor_L1.set(0)
         if self.joystick.getRawButton(1):
-            self.motor.set(0.1)
+            self.motor_L1.set(0.1)
         else:
-            self.motor.set(0)
+            self.motor_L1.set(0)
 
 
 if __name__ == "__main__":
