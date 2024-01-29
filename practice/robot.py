@@ -1,8 +1,8 @@
-import robotpy, wpilib, wpilib.drive, rev, math
+import robotpy, wpilib, wpilib.drive, rev, math, phoenix5
 
 class MyRobot(wpilib.TimedRobot):
-    cim_motor = wpilib.CANStatus()
-    print(cim_motor)
+    def robotInit(self):
+        self.cim_motor = phoenix5.TalonSRX(0)
 
-if __name__ == "__main__":
-    wpilib.run(MyRobot)
+    def testPeriodic(self):
+        self.cim_motor.set(0.1) 
