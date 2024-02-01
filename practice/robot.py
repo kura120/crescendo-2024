@@ -1,31 +1,56 @@
-'''
-Programming a CIM motor
-CIM motors are the larger black motors connected to a Talon SRX from CTRE.
-These motors are brushed and will be used in the event REV NEOs are scarce.
+# THIS IS OUR PRACTICE PROJECT TO SPIN A MOTOR!!!!!!!!
 
-Things to know:
-Please be using the latest version of RobotPy. If you are not, run either of these commands
-    macOS: python3 -m pip install --upgrade robotpy
-           python3.XX -m pip install --upgrade robotpy              # Replace XX with your version of Python (rec. 3.11)
-           python -m pip install --upgrade robotpy 
-
-    Windows: py -3 -m pip install --upgrade robotpy                 # If needed, specify version of Python, for python.org installs.
-             python -m pip install --upgrade robotpy                # Run if you installed Python from the Windows Store.
-
-Make sure the following package is installed or up-to-date: robotpy-ctre
-
-When testing, rename this file to robot.py and make sure a joystick is connected to port 0.
-
-'''
-
-import robotpy, wpilib, wpilib.drive, phoenix5 
+import robotpy, wpilib, wpilib.drive, rev
+import math, time
 
 
 class MyRobot(wpilib.TimedRobot):
+    brushless = rev.CANSparkMaxLowLevel.MotorType.kBrushless
+    
     def robotInit(self):
-        self.CIM = phoenix5.TalonSRX(1)         # Replace ID with another number if 1 does not work.
-        self.joystick = wpilib.Joystick(0)
+        #MOTOR CONTROLS _ LEFT
+        self.motor_L1 = rev.CANSparkMax(1, self.brushless) 
+        # self.motor_L2 = rev.CANSparkMax(1, self.brushless)
+
+            
+        # self.motors_L = wpilib.MotorControllerGroup(self.motor_L1, self.motor_L2)
+
+            #MOTOR CONTROL _ RIGHT
+
+            #self.motor_R1 = rev.CANSparkMax(3, self.brushless) 
+            #self.motor_R2 = rev.CANSparkMax(4, self.brushless)
+
+            
+        # self.motors_R = wpilib.MotorControllerGroup(self.motor_R1, self.motor_R2)
+
+
+
+
+
+        self.motorEncoder = self.motor_L1.getEncoder()
+        self.motor_L1.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
+        self.motorEncoder.setPosition(0)
+        self.joystick = wpilib.Joystick(0)      
+
+
+    def robotPeriodic(self):
+        wpilib.SmartDashboard.putNumber("Encoder", self.motorEncoder.getPosition())
+
+
+    def disabledInit(self):
+        self.motor_L1.set(0)
+        
 
     def testPeriodic(self):
-        if self.joystick.axisGreaterThan(0, 0.1):
-            self.CIM.set(self.joystick.getY())
+        if abs(self.joystick.getY()) > 0.1: #Analog input with floats
+            self.motor_L1.set(self.joystick.getY())
+        else:
+             self.motor_L1.set(0)
+        if self.joystick.getRawButton(1):
+            self.motor_L1.set(0.1)
+        else:
+            self.motor_L1.set(0)
+
+
+if __name__ == "__main__":
+    wpilib.run(MyRobot)

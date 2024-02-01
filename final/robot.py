@@ -8,15 +8,15 @@ import robotpy, wpilib, wpilib.drive, rev, phoenix5
 import math, time
 
 class MyRobot(wpilib.TimedRobot):
-    brushless = rev.CANSparkMaxLowLevel.MotorType.kBrushless
     
     def robotInit(self):
         # Getting motors ready: each set of wheels has two motors powering it.
         # One side has to be inverted so that the robot moves forward instead of turning in place.
+        self.brushless =  rev.CANSparkLowLevel.MotorType.kBrushless
 
         # SETUP - Left Motors
-        self.motor_L1 = rev.CANSparkMax(1, self.brushless) 
-        self.motor_L2 = rev.CANSparkMax(2, self.brushless)
+        self.motor_L1 = rev.CANSparkMax(2, self.brushless) 
+        self.motor_L2 = rev.CANSparkMax(3, self.brushless)
         self.motors_L = wpilib.MotorControllerGroup(self.motor_L1, self.motor_L2)
 
         # SETUP - Right Motors
@@ -24,7 +24,7 @@ class MyRobot(wpilib.TimedRobot):
         self.motor_R2 = rev.CANSparkMax(4, self.brushless)
         self.motors_R = wpilib.MotorControllerGroup(self.motor_R1, self.motor_R2)
 
-        self.motors_R.setInverted = True
+        self.motors_R.setInverted(True)
 
         # SETUP - Motor details
 
