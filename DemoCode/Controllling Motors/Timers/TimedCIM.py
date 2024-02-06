@@ -11,7 +11,7 @@ class MyRobot(wpilib.TimedRobot):
         self.motor_timer.start()
 
     def testPeriodic(self):
-        if self.motor_timer.get() > 0.5:
+        if self.motor_timer.get() > 0.5: #seconds
             self.CIM.set(phoenix5.ControlMode.PercentOutput, 0)
         else:
             self.CIM.set(phoenix5.ControlMode.PercentOutput, 0.05)
