@@ -15,8 +15,9 @@ class MyRobot(wpilib.TimedRobot):
         self.brushless =  rev.CANSparkLowLevel.MotorType.kBrushless
 
         # SETUP - Left Motors
-        self.motor_L1 = rev.CANSparkMax(2, self.brushless) 
-        self.motor_L2 = rev.CANSparkMax(3, self.brushless)
+        self.motor_L1 = rev.CANSparkMax(1, self.brushless) 
+        self.motor_L2 = rev.CANSparkMax(2, self.brushless)
+
         self.motors_L = wpilib.MotorControllerGroup(self.motor_L1, self.motor_L2)
 
         # SETUP - Right Motors
@@ -34,30 +35,32 @@ class MyRobot(wpilib.TimedRobot):
         self.leftEncoder.setPosition(0)
         self.rightEncoder.setPosition(0)
 
-        self.motor_L1.setIdleMode(rev.CANSparkMax.IdleMode.kCoast)
-        self.motor_R1.setIdleMode(rev.CANSparkMax.IdleMode.kCoast)
 
-        self.joystick = wpilib.Joystick(0)      
-
+        #Idle mode: brake
+        idle_mode = rev.CANSparkMax.IdleMode.kBrake
+        self.motor_L1.setIdleMode(idle_mode)
+        self.motor_R1.setIdleMode(idle_mode)
+       
+        #check player number
+        self.controller = wpilib.PS4Controller(0)      
+        self.speed = 0.5 #speed control
+        self.drive = wpilib.drive.DifferentialDrive(
+           self.motors_L, self.motors_R
+           )
 
     def robotPeriodic(self):
         wpilib.SmartDashboard.putNumber("Left Encoder", self.leftEncoder.getPosition())
         wpilib.SmartDashboard.putNumber("Right Encoder", self.rightEncoder.getPosition())
-
-
-    def disabledInit(self):
-        self.motor_L1.set(0)
         
 
     def testPeriodic(self):
-        if abs(self.joystick.getY()) > 0.1: #Analog input with floats
-            self.motor_L1.set(self.joystick.getY())
-        else:
-             self.motor_L1.set(0)
-        if self.joystick.getRawButton(1):
-            self.motor_L1.set(0.1)
-        else:
-            self.motor_L1.set(0)
+        self.drive.tankDrive(
+            self.controller.getLeftY()*self.speed,
+            self.controller.getRightY()*self.speed
+        )
+
+
+          
 
 
 if __name__ == "__main__":
