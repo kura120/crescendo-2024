@@ -53,14 +53,14 @@ class MyRobot(wpilib.TimedRobot):
         wpilib.SmartDashboard.putNumber("Right Encoder", self.rightEncoder.getPosition())
         
 
-    def testPeriodic(self):
+    def teleopPeriodic(self):
         self.drive.tankDrive(
             self.controller.getLeftY()*self.speed,
             self.controller.getRightY()*self.speed
         )
 
 
-          
+    
 
 
 if __name__ == "__main__":
