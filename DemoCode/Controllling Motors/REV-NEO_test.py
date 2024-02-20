@@ -28,6 +28,5 @@ class MyRobot(wpilib.TimedRobot):
 
     def testPeriodic(self):
         if self.joystick.axisGreaterThan(0, 0.1):
-            if self.NEO_Encoder.getPosition() < 100 and self.NEO_Encoder.getPosition() >= 0:
-                # The motor will stop if you move it too much.
-                self.NEO.set(self.joystick.getY())
+            if self.NEO_Encoder.getPosition() < 1000 and self.NEO_Encoder.getPosition() >= 0:
+                self.NEO.set(0.1)
