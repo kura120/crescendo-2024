@@ -43,7 +43,7 @@ class MyRobot(wpilib.TimedRobot):
        
         #check player number
         self.controller = wpilib.PS4Controller(0)      
-        self.speed = 0.5 #speed control
+        self.speed = 0.5 #CONTROL SPEED HERE
         self.drive = wpilib.drive.DifferentialDrive(
            self.motors_L, self.motors_R
            )
