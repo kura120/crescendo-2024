@@ -17,32 +17,29 @@ class MyRobot(wpilib.TimedRobot):
         self.brushless =  rev.CANSparkLowLevel.MotorType.kBrushless
 
         # SETUP - NEED TO ASSIGN CORRECT IDEA TO MOTOR CONTROLLER!!!
-        self.outmotor_L = rev.CANSparkMax(5, self.brushless) 
+        self.climber = rev.CANSparkMax(5, self.brushless) 
     
-        # SETUP - Right Motor
-        self.outmotor_R = rev.CANSparkMax(6, self.brushless) 
-        self.outmotor_R.setInverted(True)
+     
       #  self.outmotors = wpilib.MotorControllerGroup(self.outmotor_R, self.outmotor_L)
         # SETUP - Motor details
 
-        self.outleftEncoder = self.outmotor_L.getEncoder()
-        self.outrightEncoder = self.outmotor_R.getEncoder()
+        self.climberEncoder = self.climber.getEncoder()
 
-        self.outleftEncoder.setPosition(0)
-        self.outrightEncoder.setPosition(0)
+        self.climberEncoder.setPosition(0)
 
+#cc - up 
+#ccw - down
 
         #Idle mode: brake
         idle_mode = rev.CANSparkMax.IdleMode.kBrake
-        self.outmotor_L.setIdleMode(idle_mode)
-        self.outmotor_R.setIdleMode(idle_mode)
+        self.climber.setIdleMode(idle_mode)
        
-        #check player number
-        self.controller = wpilib.PS4Controller(0)      
-        self.speed = 0.5 #CONTROL SPEED HERE
+        #check player number/ change button no.
+        self.controller = wpilib.XboxControllerController(0)      
+    """  self.speed = 0.5 #CONTROL SPEED HERE
         self.drive = wpilib.drive.DifferentialDrive(
-            self.outmotor_L, self.outmotor_R
-           )
+            self.climber
+           )"""
         
 
     def robotPeriodic(self):
@@ -50,13 +47,14 @@ class MyRobot(wpilib.TimedRobot):
         wpilib.SmartDashboard.putNumber("Right Encoder", self.rightEncoder.getPosition())
 
     def teleopPeriodic(self):
-        self.drive.tankDrive(
-           self.controller.getLeftY()*self.speed,
-           self.controller.getRightY()*self.speed
-            
-        )
-        
+        if self.controller.Button.int(0):
+           self.speed = self.speed.set(0.5)
 
+        else:
+            self.speed = self.speed.set(-0.5)
+        
+        #CHANGE NUMBER BUTTON
+          
 
 if __name__ == "__main__":
     wpilib.run(MyRobot)
