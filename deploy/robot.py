@@ -1,5 +1,5 @@
 '''
-FINAL CODE
+Intake
 FRC 3340 Coding Team
 '''
 
@@ -13,54 +13,53 @@ class MyRobot(wpilib.TimedRobot):
         # Getting motors ready: each set of wheels has two motors powering it.
         # One side has to be inverted so that the robot moves forward instead of turning in place.
         self.brushless =  rev.CANSparkLowLevel.MotorType.kBrushless
-        self.speed = .5
 
-        # SETUP - Left Motors
-        self.motor_L1 = rev.CANSparkMax(1, self.brushless) 
-        self.motor_L2 = rev.CANSparkMax(3, self.brushless)
-        self.motors_L = wpilib.MotorControllerGroup(self.motor_L1, self.motor_L2)
+        # SETUP - Motors
+        self.motor_A = rev.CANSparkMax(2, self.brushless) 
+        self.motor_B = rev.CANSparkMax(4, self.brushless)
 
-        # SETUP - Right Motors
-        self.motor_R1 = rev.CANSparkMax(2, self.brushless) 
-        self.motor_R2 = rev.CANSparkMax(4, self.brushless)
-        self.motors_R = wpilib.MotorControllerGroup(self.motor_R1, self.motor_R2)
+        #Idle mode: brake
+        idle_mode = rev.CANSparkMax.IdleMode.kBrake
+        self.motor_A.setIdleMode(idle_mode)
+        self.motor_B.setIdleMode(idle_mode)
 
-        self.motors_R.setInverted(True)
+        self.arm_motors = wpilib.MotorControllerGroup(self.motor_A, self.motor_B)
 
-        # SETUP - Motor details
+        self.encoder_A = self.motor_A.getEncoder()
+        self.encoder_B = self.motor_B.getEncoder()
 
-        self.leftEncoder = self.motor_L1.getEncoder()
-        self.rightEncoder = self.motor_R1.getEncoder()
 
-        self.leftEncoder.setPosition(0)
-        self.rightEncoder.setPosition(0)
+        #check player number
+        self.controller = wpilib.XboxController(0)      
+        self.speed = 0.1 #CONTROL SPEED HERE
 
-        self.motor_L1.setIdleMode(rev.CANSparkMax.IdleMode.kCoast)
-        self.motor_R1.setIdleMode(rev.CANSparkMax.IdleMode.kCoast)
+        self.encoder_limit = 250
+        self.hit_limit = False
 
-        self.joystick = wpilib.Joystick(0)
-
-        self.drive = wpilib.drive.DifferentialDrive(self.motors_L, self.motors_R)     
-
-        self.test_timer = wpilib.Timer() 
-
-    def robotInit(self):
-        pass
-
-    def robotPeriodic(self):
-        pass
-
-    def robotDisabled(self):
-        pass
 
     def teleopInit(self):
-        pass
+        self.calibrate_encoders()
 
     def teleopPeriodic(self):
-        self.drive.tankDrive(self.joystick.getY() * self.speed, self.joystick.getRawAxis(5) * self.speed)
 
-    def teleopExit(self):
-        pass
+        
+        if self.controller.getPOV() == 0 and ((self.encoder_A.getPosition() + self.encoder_B.getPosition())/2 <= 250): 
+            self.arm_motors.set(self.speed)
+        elif self.controller.getPOV() == 180 and ((self.encoder_A.getPosition() + self.encoder_B.getPosition())/2 >= -250):
+            self.arm_motors.set(-self.speed)
+        else:
+            self.arm_motors.set(0)
 
-    def autonomousExit(self):
-        pass
+        if abs((self.encoder_A.getPosition() + self.encoder_B.getPosition())/2) >= 250 and not(self.hit_limit): 
+            self.controller.setRumble(self.controller.RumbleType.kLeftRumble, 0.01)
+            self.hit_limit = True
+        else:
+            self.controller.setRumble(self.controller.RumbleType.kLeftRumble, 0)
+            self.hit_limit = False
+        
+
+        
+
+    def calibrate_encoders(self):
+        self.encoder_A.setPosition(0)
+        self.encoder_B.setPosition(0)
