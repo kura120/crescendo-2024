@@ -97,7 +97,7 @@ class MyRobot(wpilib.TimedRobot):
         arm_gearbox_ratio = 100    # TODO: Find out gearbox ratio 
 
     def robotPeriodic(self):
-        pass
+        wpilib.SmartDashboard.putNumber("E")
 
     def robotDisabled(self):
         pass
