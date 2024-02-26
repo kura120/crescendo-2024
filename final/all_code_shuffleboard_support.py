@@ -96,13 +96,8 @@ class MyRobot(wpilib.TimedRobot):
 
         arm_gearbox_ratio = 100    # TODO: Find out gearbox ratio 
 
-        # Network Tables and Shuffleboard
-
-        inst = ntcore.NetworkTableInstance.getDefault()
-        self.encoder_table = inst.getTable("datatable")
-
     def robotPeriodic(self):
-        wpilib.SmartDashboard.putNumber("E", self.left_encoders[0].getPosition())
+        pass
 
     def robotDisabled(self):
         pass
