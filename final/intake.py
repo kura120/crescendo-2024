@@ -1,57 +1,66 @@
 '''
-Intake
+Intake Code
 FRC 3340 Coding Team
+
+What it's supposed to do:
+When driver holds the intake button down on their controller, the intake motors should spin.
+Upon releasing the button, the intake motors do a partial rotation to keep the note in the shooter.
 '''
 
 
-import robotpy, wpilib, wpilib.drive, rev, phoenix5
-import math, time
+import robotpy, wpilib, wpilib.drive, rev
 
 class MyRobot(wpilib.TimedRobot):
     
     def robotInit(self):
         # Getting motors ready: each set of wheels has two motors powering it.
         # One side has to be inverted so that the robot moves forward instead of turning in place.
+        #intake = 2 ways
+        #output = 1 way (forward-sync 2 motors)
         self.brushless =  rev.CANSparkLowLevel.MotorType.kBrushless
 
-        # SETUP - Motors
-        self.motor_A = rev.CANSparkMax(1, self.brushless) 
-        self.motor_B = rev.CANSparkMax(2, self.brushless)
+        # SETUP - NEED TO ASSIGN CORRECT ID TO MOTOR CONTROLLER!!!
+        self.intake_motor = rev.CANSparkMax(6, self.brushless)
 
-        #Idle mode: brake
-        idle_mode = rev.CANSparkMax.IdleMode.kBrake
-        self.motor_A.IdleMode(idle_mode)
-        self.motor_B.IdleMode(idle_mode)
+        #Idle mode: This is a windup mechanism.
+        idle_mode = rev.CANSparkMax.IdleMode.kCoast
+        self.intake_motor.setIdleMode(idle_mode)
 
-
-        self.arm_motors = wpilib.MotorControllerGroup(self.motor_A, self.motor_B)
-
-        self.encoder_A = self.motor_A.getEncoder()
-        self.encoder_B = self.motor_B.getEncoder()
-
-
-       
         #check player number
-        self.controller = wpilib.XboxController(0)      
-        self.speed = 0.1 #CONTROL SPEED HERE
+        self.controller = wpilib.PS4Controller(0)      
+        self.speed = 0.5 #CONTROL SPEED HERE
+        self.drive = wpilib.drive.DifferentialDrive(
+            self.outmotor_L, self.outmotor_R
+           )
 
-
-
-    def disabledExit(self):
-        self.encoder_A.setPosition(0)
-        self.encoder_B.setPosition(0)
-
+        # Intake-specific:
+        self.intake_speed = 0.25
+        self.intake_active = False            
+        self.reverse_intake_timer = wpilib.Timer()
 
     def robotPeriodic(self):
-        pass        
+        wpilib.SmartDashboard.putNumber("Left Encoder", self.outputEncoder.getPosition())
+        wpilib.SmartDashboard.putNumber("Right Encoder", self.rightEncoder.getPosition())
+
 
     def teleopPeriodic(self):
-        print(self.controller.getPOV())
+        '''
+        If the left trigger is pressed, the intake motors spin to take in a note.
+        After the trigger is released, the code should reverse the motors for half a second at LOW POWER to make sure the note does not touch the shooting motors.
         
+        '''
+        if self.controller.getL2Button():
+            self.intake_active = True
+            self.reverse_intake_timer.reset()
+            self.intake_motor.set(self.intake_speed)
 
-
-    
-
-
-if __name__ == "__main__":
-    wpilib.run(MyRobot)
+        else:
+            if self.intake_active:
+                self.intake_active = False
+                self.reverse_intake_timer.start()
+                self.intake_motor.set(-0.1)
+            
+            if self.reverse_intake_timer >= 0.5:
+                self.intake_motor(0)
+                self.reverse_intake_timer.stop()
+                self.reverse_intake_timer.reset()

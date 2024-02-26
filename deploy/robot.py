@@ -10,6 +10,7 @@ import math, time
 class MyRobot(wpilib.TimedRobot):
     
     def robotInit(self):
+        '''Runs on robot startup.'''
         # Getting motors ready: each set of wheels has two motors powering it.
         # One side has to be inverted so that the robot moves forward instead of turning in place.
         self.brushless =  rev.CANSparkLowLevel.MotorType.kBrushless
@@ -25,41 +26,52 @@ class MyRobot(wpilib.TimedRobot):
 
         self.arm_motors = wpilib.MotorControllerGroup(self.motor_A, self.motor_B)
 
+        # SETUP - Encoders
         self.encoder_A = self.motor_A.getEncoder()
         self.encoder_B = self.motor_B.getEncoder()
+        self.calibrate_encoders()
 
 
-        #check player number
+        # Get Robot Controller
         self.controller = wpilib.XboxController(0)      
-        self.speed = 0.1 #CONTROL SPEED HERE
 
+        # SETUP - Speed control
+        self.idling_speed = 0   # Helps maintain arm position (the arm may sag due to weight)
+        self.speed = 0.1    # Set percent output of motors (speed)
+
+        # Define positional limit for robot arm on both sides.
         self.encoder_limit = 250
-        self.hit_limit = False
 
+    def robotPeriodic(self):
+        self.mean_encoder_position = (self.encoder_A.getPosition() + self.encoder_B.getPosition()) / 2
 
-    def teleopInit(self):
+    def testInit(self):
+        '''Runs when entering Test mode.'''
+        self.calibrate_encoders()
+
+    def testPeriodic(self):
+        '''Test anything here. Runs periodically when Test mode is set on the Driver station.'''
         self.calibrate_encoders()
 
     def teleopPeriodic(self):
-
+        '''Runs periodically during teleop phase.'''
+        # REDUNDANCY - Get average encoder location for slightly better accuracy of arm location
         
-        if self.controller.getPOV() == 0 and ((self.encoder_A.getPosition() + self.encoder_B.getPosition())/2 <= 250): 
+        # Check if driver presses up or down on controller d-pad and if arm's location does not exceed limits
+        # Motors should run at our defined speed when the d-pad is pressed, and stop when released
+        if self.controller.getPOV() == 0 and (self.mean_encoder_position <= self.encoder_limit): 
             self.arm_motors.set(self.speed)
-        elif self.controller.getPOV() == 180 and ((self.encoder_A.getPosition() + self.encoder_B.getPosition())/2 >= -250):
+        elif self.controller.getPOV() == 180 and (self.mean_encoder_position <= -self.encoder_limit):
             self.arm_motors.set(-self.speed)
         else:
-            self.arm_motors.set(0)
-
-        if abs((self.encoder_A.getPosition() + self.encoder_B.getPosition())/2) >= 250 and not(self.hit_limit): 
-            self.controller.setRumble(self.controller.RumbleType.kLeftRumble, 0.01)
-            self.hit_limit = True
-        else:
-            self.controller.setRumble(self.controller.RumbleType.kLeftRumble, 0)
-            self.hit_limit = False
-        
+            # Run the motor backwards or forwards at a low speed to prevent the arm from lowering on its own.
+            if self.mean_encoder_position < 0:
+                self.arm_motors.set(self.idling_speed)
+            else:
+                self.arm_motors.set(-self.idling_speed)
 
         
-
     def calibrate_encoders(self):
+        '''Calibrate encoders on demand. Should be called when the arm is at initial position, before autonomous, or when testing.'''
         self.encoder_A.setPosition(0)
         self.encoder_B.setPosition(0)

@@ -10,51 +10,52 @@ import math, time
 class MyRobot(wpilib.TimedRobot):
     
     def robotInit(self):
-        # Getting motors ready: each set of wheels has two motors powering it.
-        # One side has to be inverted so that the robot moves forward instead of turning in place.
-        #intake = 2 ways
-        #output = 1 way (forward-sync 2 motors)
+        # SETUP - Defining motor type.
         self.brushless =  rev.CANSparkLowLevel.MotorType.kBrushless
 
-        # SETUP - NEED TO ASSIGN CORRECT IDEA TO MOTOR CONTROLLER!!!
-        self.climber = rev.CANSparkMax(5, self.brushless) 
+        # SETUP - Creating motor controller object to interact with climber.
+        climber_id = 7  # CHANGE TO MATCH ACTUAL ID OF CLIMBER MOTOR!!!
+        self.climber_motor = rev.CANSparkMax(climber_id, self.brushless) 
     
-     
-      #  self.outmotors = wpilib.MotorControllerGroup(self.outmotor_R, self.outmotor_L)
-        # SETUP - Motor details
+        # SETUP - Getting the encoder so that we can measure rotations of the climber.
 
-        self.climberEncoder = self.climber.getEncoder()
-
-        self.climberEncoder.setPosition(0)
-
-#cc - up 
-#ccw - down
+        self.climber_encoder = self.climber_motor.getEncoder()
+        self.climber_encoder.setPosition(0)                         # Calibrate climber encoder
 
         #Idle mode: brake
         idle_mode = rev.CANSparkMax.IdleMode.kBrake
         self.climber.setIdleMode(idle_mode)
        
-        #check player number/ change button no.
-        self.controller = wpilib.XboxControllerController(0)      
-    """  self.speed = 0.5 #CONTROL SPEED HERE
-        self.drive = wpilib.drive.DifferentialDrive(
-            self.climber
-           )"""
-        
+        # Get controller
+        self.controller = wpilib.XboxController(0)      
+
+        # Climber-specific controls:
+        self.climber_speed = 0.2            # Percent output to climber motor to determine how fast the climber moves from unhooked to hooked position.
+        self.is_climber_down = False        # By default, climber is off.
+        self.climber_encoder_limit = 100    # Maximum encoder position for climber down position.
 
     def robotPeriodic(self):
         wpilib.SmartDashboard.putNumber("Left Encoder", self.outputEncoder.getPosition())
         wpilib.SmartDashboard.putNumber("Right Encoder", self.rightEncoder.getPosition())
 
     def teleopPeriodic(self):
-        if self.controller.Button.int(0):
-           self.speed = self.speed.set(0.5)
-
-        else:
-            self.speed = self.speed.set(-0.5)
+        if self.controller.getRawButton(0):                         # TODO: Change button later.
+            # Reverse the climber bool. False => True, True => False.
+            self.is_climber_down = not(self.is_climber_down)
         
-        #CHANGE NUMBER BUTTON
+        # TODO: Condense this code if possible. See if you can use limit switches to avoid relying on the encoders entirely.
+        if self.is_climber_down:
+            if self.climber_encoder.getPosition() < self.climber_encoder_limit:
+                self.climber_motor.set(self.climber_speed)
+            else:
+                self.climber_motor.set(0)
+        else:
+            if self.climber_encoder.getPosition() > -self.climber_encoder_limit:
+                self.climber_motor.set(-self.climber_speed)
+            else:
+                self.climber_motor.set(0)                    
           
 
 if __name__ == "__main__":
+
     wpilib.run(MyRobot)
