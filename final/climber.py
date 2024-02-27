@@ -14,7 +14,7 @@ class MyRobot(wpilib.TimedRobot):
         self.brushless =  rev.CANSparkLowLevel.MotorType.kBrushless
 
         # SETUP - Creating motor controller object to interact with climber.
-        climber_id = 7  # CHANGE TO MATCH ACTUAL ID OF CLIMBER MOTOR!!!
+        climber_id = 1  # CHANGE TO MATCH ACTUAL ID OF CLIMBER MOTOR!!!
         self.climber_motor = rev.CANSparkMax(climber_id, self.brushless) 
     
         # SETUP - Getting the encoder so that we can measure rotations of the climber.
@@ -24,10 +24,10 @@ class MyRobot(wpilib.TimedRobot):
 
         #Idle mode: brake
         idle_mode = rev.CANSparkMax.IdleMode.kBrake
-        self.climber.setIdleMode(idle_mode)
+        self.climber_motor.setIdleMode(idle_mode)
        
         # Get controller
-        self.controller = wpilib.XboxController(0)      
+        self.controller = wpilib.PS4Controller(0)      
 
         # Climber-specific controls:
         self.climber_speed = 0.2            # Percent output to climber motor to determine how fast the climber moves from unhooked to hooked position.
@@ -35,11 +35,9 @@ class MyRobot(wpilib.TimedRobot):
         self.climber_encoder_limit = 100    # Maximum encoder position for climber down position.
 
     def robotPeriodic(self):
-        wpilib.SmartDashboard.putNumber("Left Encoder", self.outputEncoder.getPosition())
-        wpilib.SmartDashboard.putNumber("Right Encoder", self.rightEncoder.getPosition())
-
+        pass
     def teleopPeriodic(self):
-        if self.controller.getRawButton(0):                         # TODO: Change button later.
+        if self.controller.getCircleButton(0):                         # TODO: Change button later.
             # Reverse the climber bool. False => True, True => False.
             self.is_climber_down = not(self.is_climber_down)
         

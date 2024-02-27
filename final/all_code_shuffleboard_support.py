@@ -6,16 +6,7 @@ This contains all the code created in this folder complied as one to be sent to 
 This also has support for network tables allowing for values to be sent to the comptuer (and modified on the fly)
 '''
 
-import robotpy, wpilib, wpilib.drive, ntcore, rev
-
-'''
-FINAL CODE
-FRC 3340 Coding Team
-'''
-
-
-import robotpy, wpilib, wpilib.drive, rev, phoenix5
-import math, time
+import robotpy, wpilib, wpilib.drive, math, ntcore, rev
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -37,7 +28,16 @@ class MyRobot(wpilib.TimedRobot):
 
         idle_mode = [rev.CANSparkMax.IdleMode.kCoast, rev.CANSparkMax.IdleMode.kBrake]
 
-        # SETUP - Left Motors, drive
+        '''
+        Motor ID guide:
+        1-4: Drive
+        5-7: Arm/Climber
+        8-10: Intake/Outtake
+
+        Be sure to reflash any motor controllers using REV client (orange R) if necessary, or switch IDs.
+        '''
+
+        # SETUP - Left Motors, drive    
         self.drive_motor_L1 = rev.CANSparkMax(1, self.brushless) 
         self.drive_motor_L2 = rev.CANSparkMax(3, self.brushless)
         self.drive_motor_L1.setIdleMode(idle_mode[0])
@@ -92,12 +92,12 @@ class MyRobot(wpilib.TimedRobot):
 
         # Calculation parameters
         wheel_gearbox_ratio = 14
-        self.wheel_rotation = (42 * wheel_gearbox_ratio) / (6 * math.pi) # Breakdown: (42 encoder counts / gearbox ratio) * wheel circumference
+        self.wheel_distance_per_rotation = (42 * wheel_gearbox_ratio) / (6 * math.pi) # Breakdown: (42 encoder counts / gearbox ratio) * wheel circumference, inches
 
         arm_gearbox_ratio = 100    # TODO: Find out gearbox ratio 
 
     def robotPeriodic(self):
-        wpilib.SmartDashboard.putNumber("E")
+        pass
 
     def robotDisabled(self):
         pass
