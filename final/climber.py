@@ -34,26 +34,17 @@ class MyRobot(wpilib.TimedRobot):
         self.is_climber_down = False        # By default, climber is off.
         self.climber_encoder_limit = 100    # Maximum encoder position for climber down position.
 
+        self.max_distance = 128.
+
     def robotPeriodic(self):
         pass
+
     def teleopPeriodic(self):
-        if self.controller.getCircleButton(0):                         # TODO: Change button later.
-            # Reverse the climber bool. False => True, True => False.
+        if self.controller.getCircleButton(0):
             self.is_climber_down = not(self.is_climber_down)
-        
-        # TODO: Condense this code if possible. See if you can use limit switches to avoid relying on the encoders entirely.
-        if self.is_climber_down:
-            if self.climber_encoder.getPosition() < self.climber_encoder_limit:
-                self.climber_motor.set(self.climber_speed)
-            else:
-                self.climber_motor.set(0)
+            
+    def moveClimber(self, direction):
+        if direction > 0 and (self.climber_encoder * 64) <= self.max_distance:
+            self.climber_motor.set(self.climber_speed)
         else:
-            if self.climber_encoder.getPosition() > -self.climber_encoder_limit:
-                self.climber_motor.set(-self.climber_speed)
-            else:
-                self.climber_motor.set(0)                    
-          
-
-if __name__ == "__main__":
-
-    wpilib.run(MyRobot)
+            self.climber_motor.set(-self.climber_speed)

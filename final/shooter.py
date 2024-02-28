@@ -5,6 +5,8 @@ FRC 3340 Coding Team
 What it's supposed to do:
 When driver holds the intake button down on their controller, the intake motors should spin.
 Upon releasing the button, the intake motors do a partial rotation to keep the note in the shooter.
+
+WORKS.
 '''
 
 
@@ -78,9 +80,4 @@ class MyRobot(wpilib.TimedRobot):
         if self.shooting_cooldown.get() >= fire_delay:
             self.intake_motor.set(speed)
 
-    def resetShooter(self):
-        self.shooting_cooldown.stop()
-        self.shooting_cooldown.reset()
-        self.shooting_motors.set(0)
-        self.intake_motor.set(0)
         

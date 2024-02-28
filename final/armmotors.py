@@ -75,3 +75,9 @@ class MyRobot(wpilib.TimedRobot):
         '''Calibrate encoders on demand. Should be called when the arm is at initial position, before autonomous, or when testing.'''
         self.encoder_A.setPosition(0)
         self.encoder_B.setPosition(0)
+
+    def moveArm(self, direction):
+        if abs(self.mean_encoder_position) <= 250:
+            self.arm_motors.set(direction)
+        
+
