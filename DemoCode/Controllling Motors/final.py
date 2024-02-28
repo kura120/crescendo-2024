@@ -97,13 +97,17 @@ class MyRobot(wpilib.TimedRobot):
         wpilib.SmartDashboard.putNumber("Right Encoder Average", (self.right_encoders[0].getPosition() + self.right_encoders[1].getPosition() / 2))
         wpilib.SmartDashboard.putNumber("Arm Encoder Average", (self.arm_encoders[0].getPosition() + self.arm_encoders[1].getPosition() / 2))
 
-        
+
+        self.default_drive_speed = 0.75
+        self.default_arm_speed = 0.2
 
 
 
 
     def robotPeriodic(self):
-        pass
+        self.robot_speed = wpilib.SmartDashboard.getNumber("Drive Speed", self.default_drive_speed)
+        self.robot_speed = wpilib.SmartDashboard.getNumber("Arm Speed", self.default_arm_speed)
+
 
     def robotDisabled(self):
         pass
@@ -112,7 +116,7 @@ class MyRobot(wpilib.TimedRobot):
         pass
 
     def teleopPeriodic(self):
-        self.robot.tankDrive(-self.joystick.getLeftY() * self.speed, -self.joystick.getRightY() * self.speed)
+        self.robot.tankDrive(-self.joystick.getLeftY() * self.robot_speed, -self.joystick.getRightY() * self.robot_speed)
 
     def teleopExit(self):
         pass
