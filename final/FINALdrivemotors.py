@@ -13,7 +13,7 @@ class MyRobot(wpilib.TimedRobot):
         # Getting motors ready: each set of wheels has two motors powering it.
         # One side has to be inverted so that the robot moves forward instead of turning in place.
         self.brushless =  rev.CANSparkLowLevel.MotorType.kBrushless
-        self.speed = .5
+        self.speed = .5 #can change speed
 
         idle_mode = rev.CANSparkMax.IdleMode.kCoast
 

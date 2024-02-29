@@ -8,9 +8,15 @@ Upon releasing the button, the intake motors do a partial rotation to keep the n
 
 WORKS.
 '''
+"""
+   R1 = Amp speed
+   R2 = Speaker speed
+   L2 = intake
+   
+"""
 
 
-import robotpy, wpilib, wpilib.drive, rev
+import robotpy, wpilib, wpilib.drive, rev, phoenix5
 
 class MyRobot(wpilib.TimedRobot):
     
@@ -24,28 +30,27 @@ class MyRobot(wpilib.TimedRobot):
         # SETUP - NEED TO ASSIGN CORRECT ID TO MOTOR CONTROLLER!!!
 
         self.intake_motor = rev.CANSparkMax(7, self.brushless)
-        self.shooting_motor_A = rev.CANSparkMax(6, self.brushless)
-        self.shooting_motor_B = rev.CANSparkMax(5, self.brushless)
+        self.shooting_motor_A = phoenix5.TalonSRX(6, self.brushless)
+        self.shooting_motor_B = phoenix5.TalonSRX(5, self.brushless)
         self.shooting_motors = wpilib.MotorControllerGroup(self.shooting_motor_A, self.shooting_motor_B)
         self.shooting_motors.setInverted(True)
 
         #Idle mode: This is a windup mechanism.
         idle_mode = rev.CANSparkMax.IdleMode.kCoast
-        self.shooting_motor_A.setIdleMode(idle_mode)
-        self.shooting_motor_B.setIdleMode(idle_mode)
-        self.intake_motor.setIdleMode(idle_mode)
+        self.shooting_motor_A.setNeutralMode(phoenix5.NeutralMode.Brake)
+        self.shooting_motor_B.setNeutralMode(phoenix5.NeutralMode.Brake)
+        self.intake_motor.setNeutralMode(phoenix5.NeutralMode.Brake)
         
         self.intake_motor.setInverted(True)
 
 
         #check player number
         self.controller = wpilib.PS4Controller(0)      
-        self.speed = 0.5 #CONTROL SPEED HERE
 
         # Intake-specific:
         self.high_shooting_speed = 0.9
         self.low_shooting_speed = 0.4
-        self.shoot_delay = 5
+        self.shoot_delay = 5 #delay in seconds
 
         self.shooting_cooldown = wpilib.Timer()
         self.is_shooting = False
@@ -56,7 +61,8 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPeriodic(self):
         '''
         If the left trigger is pressed, the intake motors spin to take in a note.
-        After the trigger is released, the code should reverse the motors for half a second at LOW POWER to make sure the note does not touch the shooting motors.
+        After the trigger is released, the code should reverse the motors for half a second 
+        at LOW POWER to make sure the note does not touch the shooting motors.
         
         '''
         if self.controller.getR2Button():
@@ -72,7 +78,7 @@ class MyRobot(wpilib.TimedRobot):
             self.intake_motor.set(0)
 
     def shootRing(self, speed, fire_delay):
-        self.shooting_motors.set(speed)
+        self.shooting_motors.set(speed):0.4 #change speed here
 
         if self.shooting_cooldown.get() == 0:
             self.shooting_cooldown.start()
