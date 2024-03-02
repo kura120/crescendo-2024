@@ -16,16 +16,16 @@ class MyRobot(wpilib.TimedRobot):
         self.brushless =  rev.CANSparkLowLevel.MotorType.kBrushless
 
         # SETUP: Controlling Default Percent Output (Speed) of motors. Some can be hotfixed using SmartDashboard, but change values here.
-        self.drive_speed = 0.75                  #   Robot driving speed                                     (SmartDashboard)
+        self.drive_speed = 0.75                  #   Robot driving speed                                    (SmartDashboard)
         self.arm_speed = 0.2                    #   Robot arm speed                                         (SmartDashboard)
-        self.climber_speed = 0.3                #   Robot climber speed for switching climber position      (Hardcode)
         self.intake_speed = 0.3                 #   Robot intake speed                                      (SmartDashboard)
+        self.high_shot_speed_d = 0.5            #   Maximum shooter speed                                   (SmartDashboard)
+        self.low_shot_speed_d = 0.2              #   Minimum shooter speed                                  (SmartDashboard)
+        self.climber_speed = 0.3                #   Robot climber speed for switching climber position      (Hardcode)
         self.intake_reverse_speed = 0.1         #   Robot intake speed to secure note                       (Hardcode)
         self.intake_reverse_duration = 0.1      #   Robot intake duration to secure note                    (Hardcode)
-        self.high_shot_speed_d = 0.5            #   Maximum shooter speed                                   (Hardcode)
-        self.low_shot_speed_d = 0.2              #   Minimum shooter speed                                   (Hardcode)
         self.shot_delay = 3                     #   Delay between starting outtake and shot                 (Hardcode)
-        self.arm_encoder_limit = 250            #                                                           (Hardcode)
+        self.low_arm_encoder_limit = 250            #                                                           (Hardcode)
 
         self.camera = wpilib.CameraServer.launch()      
 
@@ -57,7 +57,7 @@ class MyRobot(wpilib.TimedRobot):
         self.drive_motor_R1.setIdleMode(idle_mode[0])
         self.drive_motor_R2.setIdleMode(idle_mode[0])
         self.drive_motors_R = wpilib.MotorControllerGroup(self.drive_motor_R1, self.drive_motor_R2)
-        self.drive_motors_R.setInverted(True)
+        self.drive_motors_R.setInverted(True)                   # Comment out if drive acts funny
 
 
         # SETUP - Arm Motors
@@ -96,7 +96,7 @@ class MyRobot(wpilib.TimedRobot):
         self.arm_encoders = [self.arm_motor_A.getEncoder(), self.arm_motor_B.getEncoder()]
 
         # Setup: Robot Control
-        self.controller = wpilib.PS4Controller(0)    # Connect to a joystick. Specify: PS4Controller, PS5Controller Joystick (flightstick), XboxController
+        self.controller = wpilib.PS4Controller(0)    # Connect to a joystick. Specify: PS4Controller, PS5Controller
         self.robot = wpilib.drive.DifferentialDrive(self.drive_motors_L, self.drive_motors_R)       # Setup Robot Drive System
         
         # Timers
@@ -104,8 +104,7 @@ class MyRobot(wpilib.TimedRobot):
         self.shot_timer = wpilib.Timer() 
 
         # Calculation parameters
-        wheel_gearbox_ratio = 14
-        self.wheel_distance_per_rotation = (42 * wheel_gearbox_ratio) / (6 * math.pi) # Breakdown: (42 encoder counts / gearbox ratio) * wheel circumference, inches
+        self.wheel_distance_per_rotation = (42 * 14) / (6 * math.pi) # Breakdown: (42 encoder counts / gearbox ratio) * wheel circumference, inches
 
         # Boolean values
         self.note_shot = False
@@ -117,6 +116,9 @@ class MyRobot(wpilib.TimedRobot):
         wpilib.SmartDashboard.putNumber("Low Shot Max Power", self.low_shot_speed_d)
         wpilib.SmartDashboard.putNumber("High Shot Max Power", self.high_shot_speed_d)
 
+        # Limit Switch for Arm
+        self.limit_switch_high_arm = wpilib.DigitalInput(9)
+
 
 
     def robotPeriodic(self):
@@ -127,13 +129,12 @@ class MyRobot(wpilib.TimedRobot):
 
         # SmartDashboard Stats
         wpilib.SmartDashboard.putNumber("Arm Encoder Average", self.mean_encoder_position)
-        wpilib.SmartDashboard.putNumber("Shot Timer", ((self.shot_delay - (self.shot_timer.get()) / self.shot_delay)) * 100) 
+        wpilib.SmartDashboard.putNumber("Shot Timer", (self.shot_delay - (self.shot_timer.get()) / self.shot_delay) * 100) 
         wpilib.SmartDashboard.putNumber("Outtake Power", (self.shooting_motor_A.getStatorCurrent() * 100))
         wpilib.SmartDashboard.putNumber("Intake Power", (self.intake_motor.get() * 100))
         wpilib.SmartDashboard.putNumber("Left Speed", self.drive_motors_L.get() * 100) 
         wpilib.SmartDashboard.putNumber("Right Speed", self.drive_motors_R.get() * 100) 
-        wpilib.SmartDashboard.putNumber("Arm Power", self.arm_motors.get() * 100)
-
+        wpilib.SmartDashboard.putNumber("Arm Power", self.arm_motors.get() * 100)   
         wpilib.SmartDashboard.putBoolean("Intake mode", self.intake_active)
 
         # Get number and update values
@@ -142,15 +143,14 @@ class MyRobot(wpilib.TimedRobot):
         self.low_shot_speed = wpilib.SmartDashboard.getNumber("Low Shot Power", self.low_shot_speed_d) 
         self.high_shot_speed = wpilib.SmartDashboard.getNumber("High Shot Power", self.high_shot_speed_d)
 
-        # Update average encoder information:
-
-
 
     def autonomousInit(self):
-        self.auto_program = "simple move"
+        self.auto_program = "simple move"           # Copy and paste case statements
         self.autonomous_stage = 1
         self.end_autonomous = False
-        self.calibrate_all_encoders()
+        self.arm_encoders[0].setPosition(0)
+        self.arm_encoders[1].setPosition(0)
+
 
     def autonomousPeriodic(self):
         def move_robot(distance):
@@ -166,17 +166,18 @@ class MyRobot(wpilib.TimedRobot):
         Alliance area is 26 feet 11.128 inches wide, 9 ft 10.25 ft deep
         '''
         match self.auto_program:
-            case "simple move":
+            case "simple move":                 # case 1
                 match self.autonomous_stage:
                     case 1:
                         move_robot(36)
-            case "shoot 2 notes":
+
+            case "shoot notes to speaker, assuming robot preloaded":            # case 2
                 match self.autonomous_stage:
                     case 1:
                         self.autonomous_stage += 1
 
                     case 2:
-                        self.shootRing(self.high_shot_speed, 1)
+                        self.shootRing(self.high_shot_speed_d, 2)
 
                         if self.note_shot:
                             self.note_shot = False
@@ -188,21 +189,15 @@ class MyRobot(wpilib.TimedRobot):
                                 self.autonomous_stage = 0
                             else:
                                 self.autonomous_stage += 1
-                        
                     
                     case 3:
                         pass
                         
+            case "amp":
+                match self.autonomous_stage:
+                    case 1:
+                        pass
 
-
-                            
-                        
-
-    def robotDisabled(self):
-        pass
-
-    def teleopInit(self):
-        pass
 
     def teleopPeriodic(self):
         self.robot.tankDrive(-self.controller.getLeftY() * self.robot_speed, -self.controller.getRightY() * self.robot_speed)
@@ -220,11 +215,9 @@ class MyRobot(wpilib.TimedRobot):
 
         if not(self.intake_active):
             if self.controller.getR2Button():
-                print("Shooter Should Shoot", self.high_shot_speed)
                 self.shootRing(self.high_shot_speed, self.shot_delay)
 
             elif self.controller.getR1Button():
-                print("Shooter Should Shoot")
                 self.shootRing(self.low_shot_speed, self.shot_delay)
             
             else:
@@ -240,14 +233,24 @@ class MyRobot(wpilib.TimedRobot):
             pass
             
         
+    # RUN TEST TO CALIBRATE EVERYTHING!!!!!! INCLUDING THE ARM AND CLIMBER!!
+    def testPeriodic(self):
+        self.turnClimber(-self.climber_speed)
+        self.moveArm(self.arm_speed)
 
-    def teleopExit(self):
-        pass
 
+    def testExit(self):
+        self.arm_encoders[0].setPosition(0)
+        self.arm_encoders[1].setPosition(0)
 
+    
     def moveArm(self, direction):  
-        if abs(self.mean_encoder_position) <= self.arm_encoder_limit:
-            self.arm_motors.set(direction)
+        if abs(self.mean_encoder_position) <= self.low_arm_encoder_limit:
+            # Check if the limit switch located at highest point of arm is not activated.
+            if direction < 0 and self.limit_switch_high_arm.get():
+                self.arm_motors.set(0)
+            else:
+                self.arm_motors.set(direction)
 
         
     def activateIntake(self, activate):
@@ -282,14 +285,6 @@ class MyRobot(wpilib.TimedRobot):
             self.intake_motor.set(speed)
             self.shot_timer.stop()
     
-
-    def calibrate_all_encoders(self):     
-        self.left_encoders[0].setPosition(0)
-        self.left_encoders[1].setPosition(0)
-        self.right_encoders[0].setPosition(0)
-        self.right_encoders[1].setPosition(0)
-        self.arm_encoders[0].setPosition(0)
-        self.arm_encoders[1].setPosition(0)
     
     def turnClimber(self, speed):
         self.climber_motor.set(phoenix5.ControlMode.PercentOutput, speed)
