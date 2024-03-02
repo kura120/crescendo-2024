@@ -16,14 +16,14 @@ class MyRobot(wpilib.TimedRobot):
         self.brushless =  rev.CANSparkLowLevel.MotorType.kBrushless
 
         # SETUP: Controlling Default Percent Output (Speed) of motors. Some can be hotfixed using SmartDashboard, but change values here.
-        self.drive_speed = 0.5                  #   Robot driving speed                                     (SmartDashboard)
-        self.arm_speed = 0.1                    #   Robot arm speed                                         (SmartDashboard)
-        self.climber_speed = 0.1                #   Robot climber speed for switching climber position      (Hardcode)
-        self.intake_speed = 0.1                 #   Robot intake speed                                      (SmartDashboard)
+        self.drive_speed = 0.75                  #   Robot driving speed                                     (SmartDashboard)
+        self.arm_speed = 0.2                    #   Robot arm speed                                         (SmartDashboard)
+        self.climber_speed = 0.3                #   Robot climber speed for switching climber position      (Hardcode)
+        self.intake_speed = 0.3                 #   Robot intake speed                                      (SmartDashboard)
         self.intake_reverse_speed = 0.1         #   Robot intake speed to secure note                       (Hardcode)
         self.intake_reverse_duration = 0.1      #   Robot intake duration to secure note                    (Hardcode)
-        self.strong_shot_speed = 0.3            #   Maximum shooter speed                                   (Hardcode)
-        self.weak_shot_speed = 0.1              #   Minimum shooter speed                                   (Hardcode)
+        self.high_shot_speed_d = 0.5            #   Maximum shooter speed                                   (Hardcode)
+        self.low_shot_speed_d = 0.2              #   Minimum shooter speed                                   (Hardcode)
         self.shot_delay = 3                     #   Delay between starting outtake and shot                 (Hardcode)
         self.arm_encoder_limit = 250            #                                                           (Hardcode)
 
@@ -44,19 +44,20 @@ class MyRobot(wpilib.TimedRobot):
         '''
 
         # SETUP - Left Motors, drive    
-        self.drive_motor_L1 = rev.CANSparkMax(2, self.brushless) 
-        self.drive_motor_L2 = rev.CANSparkMax(4, self.brushless)
+        self.drive_motor_L1 = rev.CANSparkMax(1, self.brushless) 
+        self.drive_motor_L2 = rev.CANSparkMax(3, self.brushless)
         self.drive_motor_L1.setIdleMode(idle_mode[0])
         self.drive_motor_L2.setIdleMode(idle_mode[0])
         self.drive_motors_L = wpilib.MotorControllerGroup(self.drive_motor_L1, self.drive_motor_L2)
 
 
         # SETUP - Right Motors, drive
-        self.drive_motor_R1 = rev.CANSparkMax(1, self.brushless) 
-        self.drive_motor_R2 = rev.CANSparkMax(3, self.brushless)
+        self.drive_motor_R1 = rev.CANSparkMax(2, self.brushless) 
+        self.drive_motor_R2 = rev.CANSparkMax(4, self.brushless)
         self.drive_motor_R1.setIdleMode(idle_mode[0])
         self.drive_motor_R2.setIdleMode(idle_mode[0])
         self.drive_motors_R = wpilib.MotorControllerGroup(self.drive_motor_R1, self.drive_motor_R2)
+        self.drive_motors_R.setInverted(True)
 
 
         # SETUP - Arm Motors
@@ -64,6 +65,8 @@ class MyRobot(wpilib.TimedRobot):
         self.arm_motor_B = rev.CANSparkMax(6, self.brushless)
         self.arm_motor_A.setIdleMode(idle_mode[1])
         self.arm_motor_B.setIdleMode(idle_mode[1])
+        self.arm_motor_A.setInverted(True)
+        self.arm_motor_B.setInverted(False)
         self.arm_motors = wpilib.MotorControllerGroup(self.arm_motor_A, self.arm_motor_B)
 
 
@@ -83,6 +86,9 @@ class MyRobot(wpilib.TimedRobot):
         self.shooting_motor_B.setNeutralMode(idle_mode[2])
 
         self.shooting_motor_B.set(phoenix5.ControlMode.Follower, 9)
+
+        self.shooting_motor_A.setInverted(True)
+        self.shooting_motor_B.setInverted(True)
 
         # SETUP - Encoders
         self.left_encoders = [self.drive_motor_L1.getEncoder(), self.drive_motor_L2.getEncoder()]
@@ -108,8 +114,8 @@ class MyRobot(wpilib.TimedRobot):
         # Parameters that can be modified on SmartDashboard
         wpilib.SmartDashboard.putNumber("Maximum Drive Speed", (self.drive_speed * 100))
         wpilib.SmartDashboard.putNumber("Maximum Arm Power", (self.arm_speed * 100))
-        wpilib.SmartDashboard.putNumber("Low Shot Max Power", self.weak_shot_speed * 100)
-        wpilib.SmartDashboard.putNumber("High Shot Max Power", self.strong_shot_speed * 100)
+        wpilib.SmartDashboard.putNumber("Low Shot Max Power", self.low_shot_speed_d)
+        wpilib.SmartDashboard.putNumber("High Shot Max Power", self.high_shot_speed_d)
 
 
 
@@ -121,20 +127,20 @@ class MyRobot(wpilib.TimedRobot):
 
         # SmartDashboard Stats
         wpilib.SmartDashboard.putNumber("Arm Encoder Average", self.mean_encoder_position)
-        wpilib.SmartDashboard.putNumber("Shot Timer", (self.shot_delay - self.shot_timer.get()) / self.shot_delay * 100) 
+        wpilib.SmartDashboard.putNumber("Shot Timer", ((self.shot_delay - (self.shot_timer.get()) / self.shot_delay)) * 100) 
         wpilib.SmartDashboard.putNumber("Outtake Power", (self.shooting_motor_A.getStatorCurrent() * 100))
         wpilib.SmartDashboard.putNumber("Intake Power", (self.intake_motor.get() * 100))
         wpilib.SmartDashboard.putNumber("Left Speed", self.drive_motors_L.get() * 100) 
-        wpilib.SmartDashboard.putNumber("Right Speed", self.drive_motors_L.get() * 100) 
+        wpilib.SmartDashboard.putNumber("Right Speed", self.drive_motors_R.get() * 100) 
         wpilib.SmartDashboard.putNumber("Arm Power", self.arm_motors.get() * 100)
 
         wpilib.SmartDashboard.putBoolean("Intake mode", self.intake_active)
 
         # Get number and update values
-        self.robot_speed = wpilib.SmartDashboard.getNumber("Maximum Drive Speed", self.drive_speed) / 100
-        self.arm_speed = wpilib.SmartDashboard.getNumber("Maximum Arm Power", self.arm_speed) / 100
-        self.low_shot_speed = wpilib.SmartDashboard.getNumber("Low Shot Power", self.weak_shot_speed) / 100 
-        self.high_shot_speed = wpilib.SmartDashboard.getNumber("High Shot Power", self.strong_shot_speed) / 100
+        self.robot_speed = wpilib.SmartDashboard.getNumber("Maximum Drive Speed", self.drive_speed)
+        self.arm_speed = wpilib.SmartDashboard.getNumber("Maximum Arm Power", self.arm_speed)
+        self.low_shot_speed = wpilib.SmartDashboard.getNumber("Low Shot Power", self.low_shot_speed_d) 
+        self.high_shot_speed = wpilib.SmartDashboard.getNumber("High Shot Power", self.high_shot_speed_d)
 
         # Update average encoder information:
 
@@ -205,22 +211,34 @@ class MyRobot(wpilib.TimedRobot):
             self.moveArm(-self.arm_speed)
         elif self.controller.getPOV() == 180:
             self.moveArm(self.arm_speed)
+        else:
+            self.moveArm(0)
         
         self.activateIntake(self.controller.getL2Button())
 
+        self.turnClimber((-self.controller.getCircleButton() + 0 + self.controller.getCrossButton()) * self.climber_speed)
+
         if not(self.intake_active):
             if self.controller.getR2Button():
-                self.shootRing(self.strong_shot_speed, self.shot_delay)
+                print("Shooter Should Shoot", self.high_shot_speed)
+                self.shootRing(self.high_shot_speed, self.shot_delay)
 
             elif self.controller.getR1Button():
-                self.shootRing(self.weak_shot_speed, self.shot_delay)
+                print("Shooter Should Shoot")
+                self.shootRing(self.low_shot_speed, self.shot_delay)
+            
+            else:
+                self.intake_motor.set(0)   
+                self.shooting_motor_A.set(phoenix5.ControlMode.PercentOutput, 0)
+                self.note_shot = False
+                self.shot_timer.stop()
+                self.shot_timer.reset()
+                print("Shooter Disabled")
+
         
         else:
-            self.note_shot = False
-            self.shot_timer.stop()
-            self.shot_timer.reset()
-            self.shooting_motor_A.set(phoenix5.ControlMode.PercentOutput, 0)
-            self.intake_motor.set(0)
+            pass
+            
         
 
     def teleopExit(self):
@@ -256,7 +274,6 @@ class MyRobot(wpilib.TimedRobot):
     def shootRing(self, speed, fire_delay):
         self.shooting_motor_A.set(phoenix5.ControlMode.PercentOutput, speed)
 
-
         if self.shot_timer.get() == 0:
             self.shot_timer.start()
         
@@ -273,4 +290,6 @@ class MyRobot(wpilib.TimedRobot):
         self.right_encoders[1].setPosition(0)
         self.arm_encoders[0].setPosition(0)
         self.arm_encoders[1].setPosition(0)
-        
+    
+    def turnClimber(self, speed):
+        self.climber_motor.set(phoenix5.ControlMode.PercentOutput, speed)
