@@ -4,6 +4,7 @@ import wpilib
 from components.test_cim_drive import CIMDrive
 from components.shooter import Shooter
 from components.climber import Climber
+from components.dashboard import Dashboard
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -11,6 +12,7 @@ class MyRobot(wpilib.TimedRobot):
         self.drive = CIMDrive()
         self.shooter = Shooter()
         self.climber = Climber()
+        self.dashboard = Dashboard()
 
         self.controller = wpilib.Joystick(0)
 
@@ -21,11 +23,20 @@ class MyRobot(wpilib.TimedRobot):
             "TD Right": self.controller.getRawAxis(5),
             "Shooter Low": self.controller.getRawButton(4),
             "Shooter High": self.controller.getRawButton(5),
+            "Intake": self.controller.getRawButton(6),
+            "Climber Up": self.controller.getRawButton(7),
+            "Climber Down": self.controller.getRawButton(8)
+        }
 
+        self.dashboard_log = {
+            "Left Drive Power": self.drive.left_drive_train.get(),
+            "Right Drive Power": self.drive.right_drive_train.get(),
+            "Climber State": self.climber.climber_state,
         }
 
     def teleopPeriodic(self):
         self.drive.arcade_drive(self.button_mappings["AD Forward Axis"], self.button_mappings["AD Rotate Axis"])
+        self.dashboard.update_dashboard(self.dashboard_log)
 
 
     def testPeriodic(self):
