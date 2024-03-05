@@ -21,11 +21,12 @@ class MyRobot(wpilib.TimedRobot):
             "TD Right": self.controller.getRawAxis(5),
             "Shooter Low": self.controller.getRawButton(4),
             "Shooter High": self.controller.getRawButton(5),
-
+            "Intake": self.controller.getRawButton(6)
         }
 
     def teleopPeriodic(self):
         self.drive.arcade_drive(self.button_mappings["AD Forward Axis"], self.button_mappings["AD Rotate Axis"])
+        self.shooter.intake.activate_intake(self.controller.getbu)
 
 
     def testPeriodic(self):

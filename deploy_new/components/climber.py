@@ -1,14 +1,14 @@
-import wpilib, phoenix5
+import wpilib, rev
 
 class Climber:
     def __init__(self):
-        idle_mode = phoenix5.NeutralMode.Brake
+        idle_mode = rev.CANSparkMax.IdleMode.kBrake
         self.speed = 0.4
         self.climber_states = ["UP", "NEUTRAL", "DOWN"]
         self.climber_state = self.climber_states[0]
     
-        self.climber_motor = phoenix5.WPI_TalonSRX(7)   
-        self.climber_motor.setNeutralMode(idle_mode)
+        self.climber_motor = rev.CANSparkMax(7, rev.CANSparkLowLevel.MotorType.kBrushless)   
+        self.climber_motor.setIdleMode(idle_mode)
 
     def move_climber(self, direction):
         match direction:
