@@ -39,9 +39,4 @@ class Drive:
 
     def arcade_drive(self, forward, rotate):
         self.robot_drive.setMaxOutput(self.speed)
-        self.robot_drive.arcadeDrive(xSpeed=(forward), zRotation=(rotate))
-
-    def tank_drive(self, left, right):
-        self.robot_drive.setMaxOutput(self.speed)
-        self.robot_drive.tankDrive(leftSpeed=left * self.speed, rightSpeed=right*self.speed)
-        
+        self.robot_drive.arcadeDrive(xSpeed=(forward / 1 + abs(rotate)), zRotation=(rotate))

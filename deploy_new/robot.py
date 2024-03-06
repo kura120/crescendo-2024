@@ -6,7 +6,7 @@ Modular
 Components folder contains modules that are imported.
 '''
 import wpilib
-from components.test_cim_drive import Drive
+from components.drive import Drive
 from components.shooter import Shooter
 from components.climber import Climber
 from components.dashboard import Dashboard
@@ -15,8 +15,8 @@ from components.dashboard import Dashboard
 class MyRobot(wpilib.TimedRobot):
     def robotInit(self):
         self.drive = Drive()
-        # self.shooter = Shooter()
-        # self.climber = Climber()
+        self.shooter = Shooter()
+        self.climber = Climber()
         self.dashboard = Dashboard()
 
         self.controller = wpilib.Joystick(0)
@@ -30,14 +30,12 @@ class MyRobot(wpilib.TimedRobot):
     def robotPeriodic(self):
         self.inputs = {
             "AD Forward Axis": -self.controller.getRawAxis(1),
-            "AD Rotate Axis": self.controller.getRawAxis(2),
-            "TD Left": self.controller.getRawAxis(5),
-            "TD Right": self.controller.getRawAxis(1),
-            "Shooter Low": self.controller.getRawButton(4),
-            "Shooter High": self.controller.getRawButton(5),
-            "Intake": self.controller.getRawButton(6),
-            "Climber Up": self.controller.getRawButton(7),
-            "Climber Down": self.controller.getRawButton(8)
+            "AD Rotate Axis": -self.controller.getRawAxis(2),
+            "Shooter Low": self.controller.getRawButton(6),
+            "Shooter High": self.controller.getRawButton(8),
+            "Intake": self.controller.getRawButton(7),
+            "Climber Up": self.controller.getPOV() == 0,
+            "Climber Down": self.controller.getPOV() == 180,
         }
 
         self.stats_for_dashboard = {
@@ -51,9 +49,23 @@ class MyRobot(wpilib.TimedRobot):
 
 
     def teleopPeriodic(self):
-        self.drive.tank_drive(self.inputs["TD Left"], self.inputs["TD Right"])
-        # self.drive.arcade_drive(self.inputs["AD Forward Axis"], self.inputs["AD Rotate Axis"])
+        self.drive.arcade_drive(self.inputs["AD Forward Axis"], self.inputs["AD Rotate Axis"])
 
+        self.shooter.intake.activate_intake(self.inputs["Intake"], "collect")
+
+        if self.inputs["Climber Up"]:
+            self.climber.move_climber("UP")
+        elif self.inputs["Climber Down"]:
+            self.climber.move_climber("DOWN")
+        else:
+            self.climber.move_climber("NEUTRAL")
+
+        if self.inputs["Shooter Low"]:
+            self.shooter.shoot_note(True, self.shooter.low_power_shot)
+        if self.inputs["Shooter High"]:
+            self.shooter.shoot_note(True, self.shooter.high_power_shot)
+        else:
+            self.shooter.shoot_note(False, 0)
 
     def testPeriodic(self):
         pass

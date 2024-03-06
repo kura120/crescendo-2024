@@ -9,7 +9,7 @@ class Drive:
     def __init__(self):
         ''' Creating the drive train '''
         # Parameters:
-        self.speed = 0.5
+        self.speed = 0.4
 
         # Defining motor type
         motor_type = rev.CANSparkMax.MotorType.kBrushless
