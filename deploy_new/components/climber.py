@@ -5,7 +5,7 @@ class Climber:
         idle_mode = rev.CANSparkMax.IdleMode.kBrake
         self.speed = 0.4
         self.climber_states = ["UP", "NEUTRAL", "DOWN"]
-        self.climber_state = self.climber_states[0]
+        self.climber_state = self.climber_states[1]
     
         self.climber_motor = rev.CANSparkMax(7, rev.CANSparkLowLevel.MotorType.kBrushless)   
         self.climber_motor.setIdleMode(idle_mode)

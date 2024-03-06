@@ -11,7 +11,9 @@ class Dashboard:
             if type(item) is str:
                 wpilib.SmartDashboard.putString(key, item)
             elif type(item) is float:
-                wpilib.SmartDashboard.putNumber(key, item)   
+                wpilib.SmartDashboard.putNumber(key, item) 
+            elif type(item) is bool:
+                wpilib.SmartDashboard.putBoolean(key, item) 
 
             # match type(item):
             #     case <float>:

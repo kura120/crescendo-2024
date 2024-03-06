@@ -10,7 +10,7 @@ class CIMDrive:
     def __init__(self):
         ''' Creating the drive train '''
         # Parameters:
-        self.speed = 0.75
+        self.speed = 0.5
 
         # Defining motor type
         idle_mode = phoenix5.NeutralMode.Coast
@@ -29,6 +29,8 @@ class CIMDrive:
         # Create drive trains
         self.left_drive_train = wpilib.MotorControllerGroup(self.left_motor_a, self.left_motor_b)
         self.right_drive_train = wpilib.MotorControllerGroup(self.right_motor_a, self.right_motor_b)
+
+        self.right_drive_train.setInverted(True)
 
         self.mean_encoder_position: list[float] = []
 
