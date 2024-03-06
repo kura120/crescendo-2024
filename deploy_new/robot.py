@@ -23,6 +23,7 @@ class MyRobot(wpilib.TimedRobot):
             "TD Right": self.controller.getRawAxis(5),
             "Shooter Low": self.controller.getRawButton(4),
             "Shooter High": self.controller.getRawButton(5),
+<<<<<<< HEAD
             "Intake": self.controller.getRawButton(6),
             "Climber Up": self.controller.getRawButton(7),
             "Climber Down": self.controller.getRawButton(8)
@@ -32,11 +33,18 @@ class MyRobot(wpilib.TimedRobot):
             "Left Drive Power": self.drive.left_drive_train.get(),
             "Right Drive Power": self.drive.right_drive_train.get(),
             "Climber State": self.climber.climber_state,
+=======
+            "Intake": self.controller.getRawButton(6)
+>>>>>>> 4e605e15bcb871dd65a1387c79fb9a582de76829
         }
 
     def teleopPeriodic(self):
         self.drive.arcade_drive(self.button_mappings["AD Forward Axis"], self.button_mappings["AD Rotate Axis"])
+<<<<<<< HEAD
         self.dashboard.update_dashboard(self.dashboard_log)
+=======
+        self.shooter.intake.activate_intake(self.controller.getbu)
+>>>>>>> 4e605e15bcb871dd65a1387c79fb9a582de76829
 
 
     def testPeriodic(self):
