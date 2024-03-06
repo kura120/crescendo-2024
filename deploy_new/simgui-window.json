@@ -10,20 +10,33 @@
       "style": "0",
       "userScale": "2",
       "width": "1280",
-      "xpos": "-1",
-      "ypos": "-1"
+      "xpos": "672",
+      "ypos": "387"
+    }
+  },
+  "Table": {
+    "0x4EEBB800,2": {
+      "Column 0  Width": "130",
+      "Column 1  Weight": "1.0000",
+      "RefScale": "13"
+    },
+    "0xE56EC1C2,4": {
+      "Column 0  Weight": "1.0000",
+      "Column 1  Weight": "1.0000",
+      "Column 2  Weight": "1.0000",
+      "Column 3  Weight": "1.0000"
     }
   },
   "Window": {
     "###FMS": {
       "Collapsed": "0",
       "Pos": "5,540",
-      "Size": "283,140"
+      "Size": "169,184"
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "250,465",
-      "Size": "796,73"
+      "Pos": "158,558",
+      "Size": "796,155"
     },
     "###NetworkTables": {
       "Collapsed": "0",
@@ -48,7 +61,7 @@
     "###Timing": {
       "Collapsed": "0",
       "Pos": "5,150",
-      "Size": "135,150"
+      "Size": "135,127"
     },
     "Debug##Default": {
       "Collapsed": "0",

@@ -1,7 +1,12 @@
-# Shooter inherits intake
+'''
+FRC Team 3340
+Robot code for Crescendo 2024
+Modular
 
+Components folder contains modules that are imported.
+'''
 import wpilib
-from components.test_cim_drive import CIMDrive
+from components.test_cim_drive import Drive
 from components.shooter import Shooter
 from components.climber import Climber
 from components.dashboard import Dashboard
@@ -9,23 +14,21 @@ from components.dashboard import Dashboard
 
 class MyRobot(wpilib.TimedRobot):
     def robotInit(self):
-        self.drive = CIMDrive()
+        self.drive = Drive()
         # self.shooter = Shooter()
         # self.climber = Climber()
-        # self.dashboard = Dashboard()
+        self.dashboard = Dashboard()
 
         self.controller = wpilib.Joystick(0)
 
-
-        self.dashboard_log = {
-            "Left Drive Power": self.drive.left_drive_train.get(),
-            "Right Drive Power": self.drive.right_drive_train.get(),
-            # "Climber State": self.climber.climber_state,
+        dashboard_mutables = {
+            "Max Drive Power": self.drive.speed
         }
+    
+        self.dashboard.update_dashboard(dashboard_mutables)
 
     def robotPeriodic(self):
-
-        self.button_mappings = {
+        self.inputs = {
             "AD Forward Axis": -self.controller.getRawAxis(1),
             "AD Rotate Axis": self.controller.getRawAxis(2),
             "TD Left": self.controller.getRawAxis(5),
@@ -37,17 +40,20 @@ class MyRobot(wpilib.TimedRobot):
             "Climber Down": self.controller.getRawButton(8)
         }
 
-        self.dashboard_log = {
+        self.stats_for_dashboard = {
             "Left Drive Power": self.drive.left_drive_train.get(),
             "Right Drive Power": self.drive.right_drive_train.get(),
             # "Climber State": self.climber.climber_state,
         }
 
+        self.dashboard.update_dashboard(self.stats_for_dashboard)
+        self.drive.speed = self.dashboard.fetch_dashboard_value("Max Drive Power", self.drive.speed, 0.5)
+
+
     def teleopPeriodic(self):
-        self.drive.arcade_drive(self.button_mappings["AD Forward Axis"], self.button_mappings["AD Rotate Axis"])
-        # self.dashboard.update_dashboard(self.dashboard_log)
+        self.drive.tank_drive(self.inputs["TD Left"], self.inputs["TD Right"])
+        # self.drive.arcade_drive(self.inputs["AD Forward Axis"], self.inputs["AD Rotate Axis"])
 
 
     def testPeriodic(self):
-        self.drive.tank_drive(self.button_mappings["TD Left"], self.button_mappings["TD Right"])
-        
+        pass

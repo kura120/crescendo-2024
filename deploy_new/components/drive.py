@@ -9,7 +9,7 @@ class Drive:
     def __init__(self):
         ''' Creating the drive train '''
         # Parameters:
-        self.speed = 0.75
+        self.speed = 0.5
 
         # Defining motor type
         motor_type = rev.CANSparkMax.MotorType.kBrushless
@@ -45,7 +45,10 @@ class Drive:
         for encoder in self.encoders:
             encoder.setPosition(0)
 
-    def move_robot(self, forward, rotate):
-        self.robot_drive.arcadeDrive(xSpeed=forward * self.speed, zRotation=rotate * self.speed)
+    def arcade_drive(self, forward, rotate):
+        self.robot_drive.setMaxOutput(self.speed)
+        self.robot_drive.arcadeDrive(xSpeed=forward, zRotation=rotate)
     
-        
+    def tank_drive(self, left, right):
+        self.robot_drive.setMaxOutput(self.speed)
+        self.robot_drive.tankDrive(leftSpeed=left, rightSpeed=right)
