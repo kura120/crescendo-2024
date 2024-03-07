@@ -22,7 +22,7 @@ class Intake:
         motor_type = rev.CANSparkMax.MotorType.kBrushless
         idle_mode = rev.CANSparkMax.IdleMode.kCoast
 
-        self.intake_motor = rev.CANSparkMax(7, motor_type)
+        self.intake_motor = rev.CANSparkMax(8, motor_type)
         self.intake_motor.setIdleMode(idle_mode)
         self.intake_motor.setInverted(True)
 
@@ -53,8 +53,9 @@ class Intake:
                     if self.using_intake:
                         self.using_intake = False
                         self.reverse_intake_timer.start()
-                        self.intake_motor.set(-0.1)
+                        self.intake_motor.set(self.back_speed)
                     
                     if self.reverse_intake_timer.get() >= self.reverse_intake_duration:
+                        print("WHY")
                         self.intake_motor.set(0)
                         self.reverse_intake_timer.stop()

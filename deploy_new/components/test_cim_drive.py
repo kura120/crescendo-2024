@@ -6,7 +6,7 @@ Made for CIMs
 import wpilib, wpilib.drive, phoenix5
 
 
-class CIMDrive:
+class Drive:
     def __init__(self):
         ''' Creating the drive train '''
         # Parameters:
@@ -38,8 +38,5 @@ class CIMDrive:
 
 
     def arcade_drive(self, forward, rotate):
-        self.robot_drive.arcadeDrive(xSpeed=forward * self.speed, zRotation=rotate * self.speed)
-
-    def tank_drive(self, left, right):
-        self.robot_drive.tankDrive(leftSpeed=left * self.speed, rightSpeed=right*self.speed)
-        
+        self.robot_drive.setMaxOutput(self.speed)
+        self.robot_drive.arcadeDrive(xSpeed=(forward / 1 + abs(rotate)), zRotation=(rotate))
