@@ -11,8 +11,8 @@ class Shooter:
 
         idle_mode = phoenix5.NeutralMode.Coast
     
-        self.low_power_shot = 0.4
-        self.high_power_shot = 0.8
+        self.low_power_shot = 0.1
+        self.high_power_shot = 0.2
 
         self.delay = wpilib.Timer()
         self.delay_duration = 3.0
