@@ -9,7 +9,10 @@ class Drive:
     def __init__(self):
         ''' Creating the drive train '''
         # Parameters:
-        self.speed = 0.4
+        self.default_speed = 0.5        # Change this
+
+        # DO NOT CHANGE
+        self.speed = 0.5                
 
         # Defining motor type
         motor_type = rev.CANSparkMax.MotorType.kBrushless
@@ -32,6 +35,8 @@ class Drive:
         # Create drive trains
         self.left_drive_train = wpilib.MotorControllerGroup(self.left_motor_a, self.left_motor_b)
         self.right_drive_train = wpilib.MotorControllerGroup(self.right_motor_a, self.right_motor_b)
+
+        self.left_drive_train.setInverted(True)
 
         self.mean_encoder_position: list[float] = []
 

@@ -22,9 +22,13 @@ class MyRobot(wpilib.TimedRobot):
         self.controller = wpilib.Joystick(0)
 
         dashboard_mutables = {
-            "Max Drive Power": self.drive.speed,
+            "Max Drive Power": self.drive.default_speed,
             "Speaker Shot Power": self.shooter.high_power_shot,
-            "Amp Shot Power": self.shooter.high_power_shot
+            "Amp Shot Power": self.shooter.high_power_shot,
+            "Intake Power": self.shooter.intake.default_speed,
+            "Intake Back Power": self.shooter.intake.default_reverse_speed,
+            "Climber Power": self.climber.default_speed,
+
         }
     
         self.dashboard.update_dashboard(dashboard_mutables)
@@ -44,8 +48,8 @@ class MyRobot(wpilib.TimedRobot):
         '''
 
         self.inputs = {         
-            "AD Forward Axis": -self.controller.getRawAxis(1),
-            "AD Rotate Axis": -self.controller.getRawAxis(2),
+            "AD Forward Axis": -self.controller.getY(),
+            "AD Rotate Axis": self.controller.getZ(),
             "Shooter Low": self.controller.getRawButton(6),
             "Shooter High": self.controller.getRawButton(8),
             "Intake": self.controller.getRawButton(7),
@@ -60,15 +64,19 @@ class MyRobot(wpilib.TimedRobot):
         }
 
         self.dashboard.update_dashboard(self.stats_for_dashboard)
-        self.drive.speed = self.dashboard.fetch_dashboard_value("Max Drive Power", self.drive.speed, self.drive.speed)
-        self.shooter.high_power_shot = self.dashboard.fetch_dashboard_value("Speaker Shot Power", self.shooter.high_power_shot, self.shooter.high_power_shot)
-        self.shooter.low_power_shot = self.dashboard.fetch_dashboard_value("Amp Shot Power", self.shooter.low_power_shot, self.shooter.low_power_shot)
+        self.drive.speed = self.dashboard.fetch_dashboard_value("Max Drive Power", self.drive.speed, self.drive.default_speed)
+        self.shooter.high_power_shot = self.dashboard.fetch_dashboard_value("Speaker Shot Power", self.shooter.high_power_shot, self.shooter.default_speaker)
+        self.shooter.low_power_shot = self.dashboard.fetch_dashboard_value("Amp Shot Power", self.shooter.low_power_shot, self.shooter.default_amp)
+        self.shooter.intake.speed = self.dashboard.fetch_dashboard_value("Intake Power", self.shooter.intake.speed, self.shooter.intake.default_speed)
+        self.shooter.intake.back_speed = self.dashboard.fetch_dashboard_value("Intake Back Power", self.shooter.intake.back_speed, self.shooter.intake.default_reverse_speed)
+        self.climber.speed = self.dashboard.fetch_dashboard_value("Climber Power", self.climber.speed, self.climber.default_speed)
+
+
     
 
     def teleopPeriodic(self):
         self.drive.arcade_drive(self.inputs["AD Forward Axis"], self.inputs["AD Rotate Axis"])
 
-        self.shooter.intake.activate_intake(self.inputs["Intake"], "collect")
 
         if self.inputs["Climber Up"]:
             self.climber.move_climber("UP")
@@ -76,10 +84,15 @@ class MyRobot(wpilib.TimedRobot):
             self.climber.move_climber("DOWN")
         else:
             self.climber.move_climber("NEUTRAL")
+        
+        wpilib.SmartDashboard.putBoolean("shooter", self.shooter.shooter_active)
+
+        if not(self.shooter.shooter_active):
+            self.shooter.intake.activate_intake(self.inputs["Intake"], "collect")
 
         if self.inputs["Shooter Low"]:
             self.shooter.shoot_note(True, self.shooter.low_power_shot)
-        if self.inputs["Shooter High"]:
+        elif self.inputs["Shooter High"]:
             self.shooter.shoot_note(True, self.shooter.high_power_shot)
         else:
             self.shooter.shoot_note(False, 0)
@@ -90,9 +103,7 @@ class MyRobot(wpilib.TimedRobot):
         for button in buttons:
             if self.controller.getRawButtonPressed(button):
                 print(button)
-                self.controller.setRumble(self.controller.RumbleType.kBothRumble, 0.1)
             
-        self.controller.setRumble(self.controller.RumbleType.kBothRumble, 0.)
 
         wpilib.SmartDashboard.putNumber("X", self.controller.getX())
         wpilib.SmartDashboard.putNumber("Y", self.controller.getY())

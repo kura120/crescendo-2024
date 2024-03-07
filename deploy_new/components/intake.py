@@ -16,9 +16,15 @@ import wpilib, rev
 class Intake:
 
     def __init__(self):
+
+        # Change THESE
+        self.default_speed = 0.3    
+        self.default_reverse_speed = 0.1
+
+        # NOT these
         self.speed = 0.3
-        self.back_speed = 0.1
-        self.shooting_speed = 0
+        self.back_speed = 0.1          
+        self.shooting_speed = 0        # Changed by shooter.py
 
         motor_type = rev.CANSparkMax.MotorType.kBrushless
         idle_mode = rev.CANSparkMax.IdleMode.kCoast
@@ -31,7 +37,6 @@ class Intake:
         self.reverse_intake_duration = 0.2
 
         # Intake-specific:
-        self.intake_speed = 0.1
         self.using_intake = False            
 
     def activate_intake(self, enabled, mode: str):
@@ -49,7 +54,7 @@ class Intake:
                         self.reverse_intake_timer.stop()
                         self.using_intake = True
 
-                    self.intake_motor.set(self.intake_speed)
+                    self.intake_motor.set(self.speed)
 
                 else:
                     
