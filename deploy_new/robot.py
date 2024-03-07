@@ -28,7 +28,20 @@ class MyRobot(wpilib.TimedRobot):
         self.dashboard.update_dashboard(dashboard_mutables)
 
     def robotPeriodic(self):
-        self.inputs = {
+        '''
+        Current mappings:
+        
+        D-Pad UP/DOWN - Climber
+        Left Stick Up/Down - Arcade Drive Forward
+        Right Stick Left/Right - Arcade Drive Rotate
+        L2 - Intake
+        R2 - Speaker Shot
+        R1 - Amp Shot (try to refrain from using)
+        
+        
+        '''
+
+        self.inputs = {         
             "AD Forward Axis": -self.controller.getRawAxis(1),
             "AD Rotate Axis": -self.controller.getRawAxis(2),
             "Shooter Low": self.controller.getRawButton(6),
