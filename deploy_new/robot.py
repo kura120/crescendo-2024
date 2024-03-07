@@ -22,7 +22,9 @@ class MyRobot(wpilib.TimedRobot):
         self.controller = wpilib.Joystick(0)
 
         dashboard_mutables = {
-            "Max Drive Power": self.drive.speed
+            "Max Drive Power": self.drive.speed,
+            "Speaker Shot Power": self.shooter.high_power_shot,
+            "Amp Shot Power": self.shooter.high_power_shot
         }
     
         self.dashboard.update_dashboard(dashboard_mutables)
@@ -58,8 +60,10 @@ class MyRobot(wpilib.TimedRobot):
         }
 
         self.dashboard.update_dashboard(self.stats_for_dashboard)
-        self.drive.speed = self.dashboard.fetch_dashboard_value("Max Drive Power", self.drive.speed, 0.5)
-
+        self.drive.speed = self.dashboard.fetch_dashboard_value("Max Drive Power", self.drive.speed, self.drive.speed)
+        self.shooter.high_power_shot = self.dashboard.fetch_dashboard_value("Speaker Shot Power", self.shooter.high_power_shot, self.shooter.high_power_shot)
+        self.shooter.low_power_shot = self.dashboard.fetch_dashboard_value("Amp Shot Power", self.shooter.low_power_shot, self.shooter.low_power_shot)
+    
 
     def teleopPeriodic(self):
         self.drive.arcade_drive(self.inputs["AD Forward Axis"], self.inputs["AD Rotate Axis"])
@@ -81,4 +85,23 @@ class MyRobot(wpilib.TimedRobot):
             self.shooter.shoot_note(False, 0)
 
     def testPeriodic(self):
-        pass
+        buttons = list(range(1, 15))
+
+        for button in buttons:
+            if self.controller.getRawButtonPressed(button):
+                print(button)
+                self.controller.setRumble(self.controller.RumbleType.kBothRumble, 0.1)
+            
+        self.controller.setRumble(self.controller.RumbleType.kBothRumble, 0.)
+
+        wpilib.SmartDashboard.putNumber("X", self.controller.getX())
+        wpilib.SmartDashboard.putNumber("Y", self.controller.getY())
+        wpilib.SmartDashboard.putNumber("Z", self.controller.getZ())
+
+        wpilib.SmartDashboard.putNumber("1", self.controller.getRawAxis(1))
+        wpilib.SmartDashboard.putNumber("2", self.controller.getRawAxis(2))
+        wpilib.SmartDashboard.putNumber("3", self.controller.getRawAxis(3))
+        wpilib.SmartDashboard.putNumber("4", self.controller.getRawAxis(4))
+        wpilib.SmartDashboard.putNumber("5", self.controller.getRawAxis(5))
+
+

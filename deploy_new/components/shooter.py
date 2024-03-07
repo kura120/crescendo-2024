@@ -30,6 +30,7 @@ class Shooter:
     def shoot_note(self, activate, motor_speed):
         if activate:
             self.outtake_motors.set(motor_speed)
+            self.intake.shooting_speed.set(motor_speed)
             
             if self.delay.get() == 0:
                 self.delay.start()

@@ -18,6 +18,7 @@ class Intake:
     def __init__(self):
         self.speed = 0.3
         self.back_speed = 0.1
+        self.shooting_speed = 0
 
         motor_type = rev.CANSparkMax.MotorType.kBrushless
         idle_mode = rev.CANSparkMax.IdleMode.kCoast
@@ -37,7 +38,7 @@ class Intake:
         match mode:
             case "eject":
                 if enabled:
-                    self.intake_motor.set(1)
+                    self.intake_motor.set(self.shooting_speed)
                 else:
                     self.intake_motor.set(0)
             
