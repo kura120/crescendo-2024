@@ -1,6 +1,5 @@
 
 import wpilib, phoenix5
-
 from components.intake import Intake
 
 ''' Shooter Code '''
@@ -22,6 +21,9 @@ class Shooter:
 
         self.delay = wpilib.Timer()
         self.delay_duration = 1.0
+        
+        self.wind_back_time = wpilib.Timer()
+        self.wind_back_delay = 0.25
 
         left_motor = phoenix5.WPI_TalonSRX(9)
         right_motor = phoenix5.WPI_TalonSRX(10)
@@ -37,29 +39,34 @@ class Shooter:
 
     def shoot_note(self, activate, motor_speed):
         if activate:
-            self.shooter_active = True
-            self.outtake_motors.set(motor_speed)
-            self.intake.shooting_speed = motor_speed
+            if not(self.shooter_active) and self.wind_back_time.get() < self.wind_back_delay:
+                if self.wind_back_time == 0:
+                    self.wind_back_time.start()
+                    self.outtake_motors.set(-0.25)
+            else:
+                self.outtake_motors.set(0)
+                self.wind_back_time.stop()
+                self.shooter_active = True
+                self.wind_back_time.reset()
+                self.outtake_motors.set(motor_speed)
+                self.intake.shooting_speed = motor_speed
+            
+            
+
             
             if self.delay.get() == 0:
                 self.delay.start()
 
             if self.delay.get() >= self.delay_duration:
                 self.delay.stop()
-                print("GO.")
                 self.intake.activate_intake(True, "eject")
         
         else:
             if self.shooter_active:
                 self.intake.activate_intake(False, "eject")
-
             self.shooter_active = False
             self.outtake_motors.set(0)
             self.delay.stop()
             self.delay.reset()
-
-        
-
-
 
         

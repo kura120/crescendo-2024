@@ -10,6 +10,7 @@ class Drive:
         ''' Creating the drive train '''
         # Parameters:
         self.default_speed = 0.5        # Change this
+        self.drive_style = "arcade"
 
         # DO NOT CHANGE
         self.speed = 0.5                
@@ -50,10 +51,11 @@ class Drive:
         for encoder in self.encoders:
             encoder.setPosition(0)
 
-    def arcade_drive(self, forward, rotate):
-        self.robot_drive.setMaxOutput(self.speed)
+
+    def arcade_drive(self, forward, rotate, brake):
+        self.robot_drive.setMaxOutput(self.speed / (1 + int(brake)))
         self.robot_drive.arcadeDrive(xSpeed=forward, zRotation=rotate)
     
-    def tank_drive(self, left, right):
-        self.robot_drive.setMaxOutput(self.speed)
+    def tank_drive(self, left, right, brake):
+        self.robot_drive.setMaxOutput(self.speed / (1 + int(brake)))
         self.robot_drive.tankDrive(leftSpeed=left, rightSpeed=right)

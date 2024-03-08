@@ -1,8 +1,6 @@
 import wpilib
 
 class Dashboard:
-    def __init__(self):
-        pass
 
     def update_dashboard(self, items: dict):
         for key in items.keys():
@@ -21,4 +19,6 @@ class Dashboard:
             return wpilib.SmartDashboard.getNumber(key, default)
         elif type(value) is bool:
             return wpilib.SmartDashboard.getBoolean(key, default)
+        
 
+    

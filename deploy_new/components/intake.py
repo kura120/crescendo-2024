@@ -14,7 +14,6 @@ Changes untested
 import wpilib, rev
 
 class Intake:
-
     def __init__(self):
 
         # Change THESE
@@ -38,6 +37,7 @@ class Intake:
 
         # Intake-specific:
         self.using_intake = False            
+
 
     def activate_intake(self, enabled, mode: str):
         match mode:

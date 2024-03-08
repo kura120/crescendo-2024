@@ -28,28 +28,30 @@ class MyRobot(wpilib.TimedRobot):
             "Intake Power": self.shooter.intake.default_speed,
             "Intake Back Power": self.shooter.intake.default_reverse_speed,
             "Climber Power": self.climber.default_speed,
-
+            "Drive Style": self.drive.drive_style 
         }
     
         self.dashboard.update_dashboard(dashboard_mutables)
 
     def robotPeriodic(self):
         '''
-        Current mappings:
-        
+        Current input map:
         D-Pad UP/DOWN - Climber
-        Left Stick Up/Down - Arcade Drive Forward
+        Left Stick Up/Down - Arcade Drive Forward / Tank Drive Left
+        Right Stick Up/Down - Tank Drive Right
         Right Stick Left/Right - Arcade Drive Rotate
         L2 - Intake
         R2 - Speaker Shot
+        L1 - Brake (slows down your drive speed by half, use for more precise control)
         R1 - Amp Shot (try to refrain from using)
-        
-        
         '''
 
         self.inputs = {         
-            "AD Forward Axis": -self.controller.getY(),
+            "AD Forward Axis": -self.controller.getRawAxis(1),
+            "Tank Left Axis": -self.controller.getRawAxis(1),
             "AD Rotate Axis": self.controller.getZ(),
+            "Tank Right Axis": -self.controller.getRawAxis(5),
+            "Drive Brake": self.controller.getRawButton(5),
             "Shooter Low": self.controller.getRawButton(6),
             "Shooter High": self.controller.getRawButton(8),
             "Intake": self.controller.getRawButton(7),
@@ -60,7 +62,7 @@ class MyRobot(wpilib.TimedRobot):
         self.stats_for_dashboard = {
             "Left Drive Power": self.drive.left_drive_train.get(),
             "Right Drive Power": self.drive.right_drive_train.get(),
-            # "Climber State": self.climber.climber_state,
+            "Climber State": self.climber.climber_state,
         }
 
         self.dashboard.update_dashboard(self.stats_for_dashboard)
@@ -68,15 +70,14 @@ class MyRobot(wpilib.TimedRobot):
         self.shooter.high_power_shot = self.dashboard.fetch_dashboard_value("Speaker Shot Power", self.shooter.high_power_shot, self.shooter.default_speaker)
         self.shooter.low_power_shot = self.dashboard.fetch_dashboard_value("Amp Shot Power", self.shooter.low_power_shot, self.shooter.default_amp)
         self.shooter.intake.speed = self.dashboard.fetch_dashboard_value("Intake Power", self.shooter.intake.speed, self.shooter.intake.default_speed)
-        self.shooter.intake.back_speed = self.dashboard.fetch_dashboard_value("Intake Back Power", self.shooter.intake.back_speed, self.shooter.intake.default_reverse_speed)
-        self.climber.speed = self.dashboard.fetch_dashboard_value("Climber Power", self.climber.speed, self.climber.default_speed)
-
-
-    
+        self.shooter.intake.back_speed = self.dashboard.fetch_dashboard_value("Intake Back Power", self.shooter.intake.back_speed, self.shooter.intake.default_reverse_speed)    
 
     def teleopPeriodic(self):
-        self.drive.arcade_drive(self.inputs["AD Forward Axis"], self.inputs["AD Rotate Axis"])
-
+        match self.drive.drive_style:
+            case "arcade":
+                self.drive.arcade_drive(self.inputs["AD Forward Axis"], self.inputs["AD Rotate Axis"], self.inputs['Drive Brake'])
+            case "tank":
+                self.drive.tank_drive(self.inputs["Tank Left Axis"], self.inputs["Tank Right Axis"], self.inputs['Drive Brake'])
 
         if self.inputs["Climber Up"]:
             self.climber.move_climber("UP")
@@ -85,8 +86,6 @@ class MyRobot(wpilib.TimedRobot):
         else:
             self.climber.move_climber("NEUTRAL")
         
-        wpilib.SmartDashboard.putBoolean("shooter", self.shooter.shooter_active)
-
         if not(self.shooter.shooter_active):
             self.shooter.intake.activate_intake(self.inputs["Intake"], "collect")
 
@@ -96,23 +95,4 @@ class MyRobot(wpilib.TimedRobot):
             self.shooter.shoot_note(True, self.shooter.high_power_shot)
         else:
             self.shooter.shoot_note(False, 0)
-
-    def testPeriodic(self):
-        buttons = list(range(1, 15))
-
-        for button in buttons:
-            if self.controller.getRawButtonPressed(button):
-                print(button)
-            
-
-        wpilib.SmartDashboard.putNumber("X", self.controller.getX())
-        wpilib.SmartDashboard.putNumber("Y", self.controller.getY())
-        wpilib.SmartDashboard.putNumber("Z", self.controller.getZ())
-
-        wpilib.SmartDashboard.putNumber("1", self.controller.getRawAxis(1))
-        wpilib.SmartDashboard.putNumber("2", self.controller.getRawAxis(2))
-        wpilib.SmartDashboard.putNumber("3", self.controller.getRawAxis(3))
-        wpilib.SmartDashboard.putNumber("4", self.controller.getRawAxis(4))
-        wpilib.SmartDashboard.putNumber("5", self.controller.getRawAxis(5))
-
 
