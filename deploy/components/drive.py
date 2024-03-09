@@ -9,7 +9,7 @@ class Drive:
     def __init__(self):
         ''' Creating the drive train '''
         # Parameters:
-        self.default_speed = 0.5        # Change this
+        self.default_speed = 0.7        # Change this // changed to 0.7 from 0.5 -erick
         self.drive_style = "arcade"
 
         # DO NOT CHANGE
@@ -39,13 +39,16 @@ class Drive:
 
         self.left_drive_train.setInverted(True)
 
-        self.mean_encoder_position: list[float] = []
+        self.drive_encoder_avg_pos: list[float] = []
+        self.mean_encoder_position = 0
 
         self.robot_drive = wpilib.drive.DifferentialDrive(leftMotor=self.left_drive_train, rightMotor=self.right_drive_train)
 
     def update_encoder_position(self):
-        self.mean_encoder_position = [(self.encoders[0].getPosition() + self.encoders[2].getPosition()) / 2,
-                                       (self.encoders[1].getPosition() + self.encoders[2].getPosition()) / 2]
+        # self.drive_encoder_avg_pos = [(self.encoders[0].getPosition() + self.encoders[2].getPosition()) / 2,
+        #                                (self.encoders[1].getPosition() + self.encoders[2].getPosition()) / 2]
+        
+        self.mean_encoder_position = (self.drive_encoder_avg_pos[0] + self.drive_encoder_avg_pos) / 2
 
     def calibrate_encoders(self):
         for encoder in self.encoders:

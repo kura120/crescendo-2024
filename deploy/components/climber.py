@@ -3,8 +3,8 @@ import wpilib, rev
 class Climber:
     def __init__(self):
         idle_mode = rev.CANSparkMax.IdleMode.kBrake
-        self.default_speed = 0.4
-        self.speed = 0.4
+        self.default_speed = 0.5
+        self.speed = self.default_speed
         self.climber_states = ["UP", "NEUTRAL", "DOWN"]
         self.climber_state = self.climber_states[1]
     
