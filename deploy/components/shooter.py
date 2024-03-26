@@ -7,8 +7,8 @@ from components.intake import Intake
 class Shooter:
     def __init__(self):
         # CHANGE THESE for SPEED ([0] - A [1] - B)
-        self.default_amp = [0.45, 0.4]
-        self.default_speaker = [0.9, 0.4]
+        self.default_low = [0.6, 0.6]  # changed 0.4 to 0.6  -erick
+        self.default_high = [0.95, 0.8]  # changed 0.4 to 0.6  -erick
 
 
         self.shooter_active = False
@@ -17,8 +17,9 @@ class Shooter:
         idle_mode = phoenix5.NeutralMode.Coast
         
         # DO NOT CHANGE THESE!
-        self.low_power_shot = self.default_amp
-        self.high_power_shot = self.default_speaker
+
+        self.high_power_shot = self.default_high
+        self.low_power_shot = self.default_low
 
         self.delay = wpilib.Timer()
         self.delay_duration = 2
@@ -40,19 +41,11 @@ class Shooter:
 
     def shoot_note(self, activate, motor_speeds):
         if activate:
-            # if not(self.shooter_active) and self.wind_back_time.get() < self.wind_back_delay:
-            #     if self.wind_back_time == 0:
-            #         self.wind_back_time.start()
-            #         self.outtake_motors.set(-0.25)
-            # else:
-            # self.outtake_motors.set(0)
-            # self.wind_back_time.stop()
-
             self.shooter_active = True
             self.wind_back_time.reset()
             self.motor_A.set(motor_speeds[0])
             self.motor_B.set(motor_speeds[1])
-            self.intake.shooting_speed = (motor_speeds[0])
+            self.intake.shooting_speed = (motor_speeds[1])
        
             if self.delay.get() == 0:
                 self.delay.start()

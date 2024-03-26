@@ -23,10 +23,6 @@ class MyRobot(wpilib.TimedRobot):
 
         dashboard_mutables = {
             "Max Drive Power": self.drive.default_speed,
-            "Speaker Shot Power A": self.shooter.default_speaker[0],
-            "Speaker Shot Power B": self.shooter.default_speaker[1],
-            "Amp Shot Power A": self.shooter.default_amp[0],
-            "Amp Shot Power B": self.shooter.default_amp[1],
             "Intake Power": self.shooter.intake.default_speed,
             "Intake Back Power": self.shooter.intake.default_reverse_speed,
             "Climber Power": self.climber.default_speed,
@@ -49,6 +45,12 @@ class MyRobot(wpilib.TimedRobot):
                 else:
                     self.time.stop()
                     self.drive.tank_drive(0,0, False)
+            case "shoot":
+                self.shooter.delay_duration = 3
+                self.shooter.shoot_note(True, [1, 1])
+                if self.time.get() > 5: 
+                    # self.shooter.delay_duration = 2
+                    self.shooter.shoot_note(False, [0, 0])
 
 
     def robotPeriodic(self):
@@ -69,12 +71,12 @@ class MyRobot(wpilib.TimedRobot):
         self.inputs = {         
             "AD Forward Axis": -self.controller.getRawAxis(1),
             "Tank Left Axis": -self.controller.getRawAxis(1),
-            "AD Rotate Axis": self.controller.getZ(),
+                "AD Rotate Axis": self.controller.getZ(),
             "Tank Right Axis": -self.controller.getRawAxis(5),
             "Reverse Intake from Shooter": self.controller.getRawButton(5),
             "Drive Brake": self.controller.getRawButton(2),
-            "Shooter Low": self.controller.getRawButton(6),
-            "Shooter High": self.controller.getRawButton(8),
+            "High Shot": self.controller.getRawButton(6), 
+            "Low Shot": self.controller.getRawButton(8),
             "Intake": self.controller.getRawButton(7),
             "Climber Up": self.controller.getPOV() == 0,
             "Climber Down": self.controller.getPOV() == 180,
@@ -85,17 +87,11 @@ class MyRobot(wpilib.TimedRobot):
             "Right Drive Power": self.drive.right_drive_train.get() * 100,
             "Climber State": self.climber.climber_state,
             "Shot Timer": self.shooter.delay_duration - self.shooter.delay.get(),
-            "Shooter Power": self.shooter.motor_A.get()
+            "Shooter Power A": self.shooter.motor_A.get(),
+            "Shooter Power B": self.shooter.motor_B.get(),
+        
         }
-
         self.dashboard.update_dashboard(self.stats_for_dashboard)
-        self.drive.speed = self.dashboard.fetch_dashboard_value("Max Drive Power", self.drive.speed, self.drive.default_speed)
-        self.shooter.high_power_shot[0] = self.dashboard.fetch_dashboard_value("Speaker Shot Power A", self.shooter.high_power_shot[0], self.shooter.default_speaker[0])
-        self.shooter.high_power_shot[1] = self.dashboard.fetch_dashboard_value("Speaker Shot Power B", self.shooter.high_power_shot[1], self.shooter.default_speaker[1])
-        self.shooter.low_power_shot[0] = self.dashboard.fetch_dashboard_value("Amp Shot Power A", self.shooter.low_power_shot[0], self.shooter.default_amp[0])
-        self.shooter.low_power_shot[1] = self.dashboard.fetch_dashboard_value("Amp Shot Power B", self.shooter.low_power_shot[1], self.shooter.default_amp[1])
-        self.shooter.intake.speed = self.dashboard.fetch_dashboard_value("Intake Power", self.shooter.intake.speed, self.shooter.intake.default_speed)
-        self.shooter.intake.back_speed = self.dashboard.fetch_dashboard_value("Intake Back Power", self.shooter.intake.back_speed, self.shooter.intake.default_reverse_speed)    
 
     def teleopPeriodic(self):
         match self.drive.drive_style:
@@ -114,10 +110,9 @@ class MyRobot(wpilib.TimedRobot):
 
         if self.inputs["Reverse Intake from Shooter"]:
             self.shooter.reverse_intake_from_shooter()
-            print("br")
-        elif self.inputs["Shooter High"]:
+        elif self.inputs["High Shot"]:
             self.shooter.shoot_note(True, self.shooter.high_power_shot)
-        elif self.inputs["Shooter Low"]:
+        elif self.inputs["Low Shot"]:
             self.shooter.shoot_note(True, self.shooter.low_power_shot)
         elif not(self.shooter.shooter_active):
             self.shooter.intake.activate_intake(self.inputs["Intake"], "collect")

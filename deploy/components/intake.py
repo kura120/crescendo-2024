@@ -17,7 +17,7 @@ class Intake:
     def __init__(self):
 
         # Change THESE
-        self.default_speed = 0.3    
+        self.default_speed = 0.5    
         self.default_reverse_speed = 0.1
 
         # NOT these
