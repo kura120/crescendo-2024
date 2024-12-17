@@ -5,6 +5,7 @@ Modular
 
 Components folder contains modules that are imported.
 '''
+
 import wpilib
 from components.drive import Drive
 from components.shooter import Shooter
@@ -68,10 +69,11 @@ class MyRobot(wpilib.TimedRobot):
         R1 - Amp Shot (try to refrain from using)
         '''
 
+
         self.inputs = {         
-            "AD Forward Axis": -self.controller.getRawAxis(1),
+            "AD Forward Axis": -self.controller.getRawAxis(1), 
             "Tank Left Axis": -self.controller.getRawAxis(1),
-                "AD Rotate Axis": self.controller.getZ(),
+            "AD Rotate Axis": self.controller.getZ(),
             "Tank Right Axis": -self.controller.getRawAxis(5),
             "Reverse Intake from Shooter": self.controller.getRawButton(5),
             "Drive Brake": self.controller.getRawButton(2),

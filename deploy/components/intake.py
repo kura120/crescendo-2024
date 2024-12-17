@@ -66,3 +66,13 @@ class Intake:
                     if self.reverse_intake_timer.get() >= self.reverse_intake_duration:
                         self.intake_motor.set(0)
                         self.reverse_intake_timer.stop()
+
+
+'''
+If statements
+Print statements - could be used to check if code works (if loops work)
+Variables - used in every line of code for robotics
+Different classes of commands
+Loops, different types of loops, like if loops, while loops, for loops - used for autonomous and used everytime you use a certain function
+List, strings - could be used to check if your code works
+'''
